@@ -1,0 +1,6 @@
+# .env
+/public/imgs
+/public/uploads
+/data
+/node_modules
+.vscode
