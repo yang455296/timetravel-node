@@ -34,7 +34,10 @@ async function getListData(req, res) {
     if (page > totalPages) {
       return res.redirect(`?page=${totalPages}`);
     }
-    const sql = `SELECT * FROM site ${where} ORDER BY sid LIMIT ${
+    const sql = `SELECT * FROM site 
+    JOIN site_categories ON site.site_category_sid=site_categories.site_category_sid 
+    JOIN area ON site.area_sid=area.area_sid 
+    JOIN city ON area.city_sid=city.city_sid ${where} ORDER BY sid LIMIT ${
       (page - 1) * perPage
     }, ${perPage} `;
     [rows] = await db.query(sql);
