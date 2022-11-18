@@ -22,17 +22,17 @@ router.get(["/api", "/api/list"], async (req, res) => {
 
 // C 資料寫死，要改寫成從前端來
 router.get("/api/addlist", async (req, res) => {
-  const member_sid = 11;
-  // const list_number = 1; //改用current_timestamp()		
-  const list_name = "test list 2";
+  const member_sid = 12;
+  const list_number = 4; 	
+  const list_name = "test list 21";
   const day = 3;
   const date = "2022-12-01";
   const status = 1;
   const sql =
-  "INSERT INTO `itinerary`(`member_sid`, `list_number`, `list_name`, `day`, `date`, `status`, `created_date`) VALUES (?, NOW(), ?, ?, ?, ?, NOW())"
+  "INSERT INTO `itinerary`(`member_sid`, `list_number`, `list_name`, `day`, `date`, `status`, `created_date`) VALUES (?, ?, ?, ?, ?, ?, NOW())"
   const [result] = await db.query(sql, [
     member_sid,
-    // list_number,
+    list_number,
     list_name,
     day,
     date,

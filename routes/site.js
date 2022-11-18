@@ -55,7 +55,11 @@ async function getListData(req, res) {
 
 // R
 router.get("/item/:sid", async (req, res) => {
-  const sql = "SELECT * FROM site WHERE sid=? ";
+  const sql = `SELECT * FROM site 
+    JOIN site_categories ON site.site_category_sid=site_categories.site_category_sid 
+    JOIN area ON site.area_sid=area.area_sid 
+    JOIN city ON area.city_sid=city.city_sid
+    WHERE sid=? `;
   const [data] = await db.query(sql, [req.params.sid]);
   res.json(data[0]);
 }); //單筆資料http://localhost:3001/site/item/12
