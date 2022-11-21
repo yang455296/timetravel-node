@@ -163,7 +163,7 @@ app.use("/itinerary", require(__dirname + "/routes/itinerary"));
 
 app.use("/site", require(__dirname + "/routes/site"));
 
-// app.use("/stays", require(__dirname + "/routes/stays"));
+app.use("/hotel", require(__dirname + "/routes/hotel"));
 
 // app.use("/ticket", require(__dirname + "/routes/ticket"));
 
