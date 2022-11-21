@@ -1,15 +1,107 @@
 require("dotenv").config();
 const express = require("express");
+const fileUpload = require('express-fileupload');
 const session = require("express-session");
 const MysqlStore = require("express-mysql-session")(session);
 const cors = require("cors");
-
+const bodyParser = require('body-parser');
+const morgan = require('morgan');
+const _ = require('lodash');
 const db = require(__dirname + "/modules/db_connect2");
 const sessionStore = new MysqlStore({}, db);
 const upload = require(__dirname + "/modules/upload-img");
 const fs = require("fs").promises;
 
 const app = express();
+
+// enable files upload
+// 啟動檔案上傳
+app.use(fileUpload({
+  createParentPath: true
+}));
+
+// 加入其它的middleware
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(morgan('dev'));
+
+//圖檔存放uploads/後面是自己的資料夾
+app.use('/uploads', express.static('uploads'+__dirname));
+
+
+// 單檔上傳測試
+/*--------------------------*/
+// app.post('/upload-avatar', async (req, res) => {
+//   try {
+//       if(!req.files) {
+//           res.send({
+//               status: false,
+//               message: 'No file uploaded'
+//           });
+//       } else {
+//           //使用輸入框的名稱來獲取上傳檔案 (例如 "avatar")
+//           let avatar = req.files.avatar;
+          
+//           //使用 mv() 方法來移動上傳檔案到要放置的目錄裡 (例如 "uploads")
+//           avatar.mv('./uploads/' + avatar.name);
+
+//           //送出回應
+//           res.json({
+//               status: true,
+//               message: 'File is uploaded',
+//               data: {
+//                   name: avatar.name,
+//                   mimetype: avatar.mimetype,
+//                   size: avatar.size
+//               }
+//           });
+//       }
+//   } catch (err) {
+//       res.status(500).json(err);
+//   }
+// });
+/*--------------------------*/
+
+// 多檔上傳測試
+/*--------------------------*/
+app.post('/upload-photos', async (req, res) => {
+  try {
+      if(!req.files) {
+          res.json({
+              status: false,
+              message: 'No file uploaded'
+          });
+      } else {
+          let data = []; 
+  
+          //loop all files
+          _.forEach(_.keysIn(req.files.photos), (key) => {
+              let photo = req.files.photos[key];
+              
+              //move photo to uploads directory
+              photo.mv('./uploads/' + photo.name);
+
+              //push file details
+              data.push({
+                  name: photo.name,
+                  mimetype: photo.mimetype,
+                  size: photo.size
+              });
+          });
+  
+          //return response
+          res.json({
+              status: true,
+              message: 'Files are uploaded',
+              data: data
+          });
+      }
+  } catch (err) {
+      res.status(500).json(err);
+  }
+});
+/*--------------------------*/
 
 // top-level middleware 中介軟體--------------------------------------------------
 
@@ -63,15 +155,15 @@ app.get("/", (req, res) => {
 
 // app.use("/cart", require(__dirname + "/routes/cart"));
 
-// app.use("/member", require(__dirname + "/routes/member"));
+// app.use("/users", require(__dirname + "/routes/users"));
 
-// app.use("/food", require(__dirname + "/routes/food"));
+ app.use("/food", require(__dirname + "/routes/food"));
 
 app.use("/itinerary", require(__dirname + "/routes/itinerary"));
 
 app.use("/site", require(__dirname + "/routes/site"));
 
-// app.use("/stays", require(__dirname + "/routes/stays"));
+app.use("/hotel", require(__dirname + "/routes/hotel"));
 
 // app.use("/ticket", require(__dirname + "/routes/ticket"));
 

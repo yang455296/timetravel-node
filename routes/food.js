@@ -19,12 +19,12 @@ async function getListData(req, res) {
   if (search) {
     where += ` AND 
         (
-            \`name\` LIKE ${db.escape("%" + search + "%")}
+            \`product_name\` LIKE ${db.escape("%" + search + "%")}
             OR
-            \`description\` LIKE ${db.escape("%" + search + "%")}
+            \`applicable_store\` LIKE ${db.escape("%" + search + "%")}
         ) `;
   }
-  const t_sql = `SELECT COUNT(1) totalRows FROM site ${where}`;
+  const t_sql = `SELECT COUNT(1) totalRows FROM food_product_all ${where}`;
   // 分頁功能
   const [[{ totalRows }]] = await db.query(t_sql);
   let totalPages = 0;
@@ -34,10 +34,7 @@ async function getListData(req, res) {
     if (page > totalPages) {
       return res.redirect(`?page=${totalPages}`);
     }
-    const sql = `SELECT * FROM site 
-    JOIN site_categories ON site.site_category_sid=site_categories.site_category_sid 
-    JOIN area ON site.area_sid=area.area_sid 
-    JOIN city ON area.city_sid=city.city_sid ${where} ORDER BY sid LIMIT ${
+    const sql = `SELECT * FROM food_product_all ${where} ORDER BY sid LIMIT ${
       (page - 1) * perPage
     }, ${perPage} `;
     [rows] = await db.query(sql);
@@ -55,11 +52,7 @@ async function getListData(req, res) {
 
 // R
 router.get("/item/:sid", async (req, res) => {
-  const sql = `SELECT * FROM site 
-    JOIN site_categories ON site.site_category_sid=site_categories.site_category_sid 
-    JOIN area ON site.area_sid=area.area_sid 
-    JOIN city ON area.city_sid=city.city_sid
-    WHERE sid=? `;
+  const sql = "SELECT * FROM food_product_all WHERE sid=? ";
   const [data] = await db.query(sql, [req.params.sid]);
   res.json(data[0]);
 }); //單筆資料http://localhost:3001/site/item/12
