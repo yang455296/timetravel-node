@@ -1,6 +1,6 @@
 # .env
 /public/imgs
-/public/uploads
+/uploads
 /data
 /node_modules
 .vscode

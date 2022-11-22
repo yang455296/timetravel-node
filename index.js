@@ -26,80 +26,83 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(morgan('dev'));
 
-//圖檔存放uploads/後面是自己的資料夾
-app.use('/uploads', express.static('uploads'+__dirname));
-
+//讓uploads目錄公開
+// https://expressjs.com/zh-tw/starter/static-files.html
+//app.use(express.static('uploads'));
+// 如果想要改網址路徑用下面的
+// 您可以透過 /static 路徑字首，來載入 uploads 目錄中的檔案。
+app.use('/uploads', express.static('uploads'))
 
 // 單檔上傳測試
 /*--------------------------*/
-// app.post('/upload-avatar', async (req, res) => {
-//   try {
-//       if(!req.files) {
-//           res.send({
-//               status: false,
-//               message: 'No file uploaded'
-//           });
-//       } else {
-//           //使用輸入框的名稱來獲取上傳檔案 (例如 "avatar")
-//           let avatar = req.files.avatar;
-          
-//           //使用 mv() 方法來移動上傳檔案到要放置的目錄裡 (例如 "uploads")
-//           avatar.mv('./uploads/' + avatar.name);
+app.post('/upload-avatar', async (req, res) => {
+try {
+    if(!req.files) {
+        res.send({
+            status: false,
+            message: 'No file uploaded'
+        });
+    } else {
+        //使用輸入框的名稱來獲取上傳檔案 (例如 "avatar")
+        let avatar = req.files.avatar;
+        
+        //使用 mv() 方法來移動上傳檔案到要放置的目錄裡 (例如 "uploads")
+        avatar.mv('./uploads/' + avatar.name);
 
-//           //送出回應
-//           res.json({
-//               status: true,
-//               message: 'File is uploaded',
-//               data: {
-//                   name: avatar.name,
-//                   mimetype: avatar.mimetype,
-//                   size: avatar.size
-//               }
-//           });
-//       }
-//   } catch (err) {
-//       res.status(500).json(err);
-//   }
-// });
+        //送出回應
+        res.json({
+            status: true,
+            message: 'File is uploaded',
+            data: {
+                name: avatar.name,
+                mimetype: avatar.mimetype,
+                size: avatar.size
+            }
+        });
+    }
+} catch (err) {
+    res.status(500).json(err);
+}
+});
 /*--------------------------*/
 
 // 多檔上傳測試
 /*--------------------------*/
 app.post('/upload-photos', async (req, res) => {
-  try {
-      if(!req.files) {
-          res.json({
-              status: false,
-              message: 'No file uploaded'
-          });
-      } else {
-          let data = []; 
-  
-          //loop all files
-          _.forEach(_.keysIn(req.files.photos), (key) => {
-              let photo = req.files.photos[key];
-              
-              //move photo to uploads directory
-              photo.mv('./uploads/' + photo.name);
+try {
+    if(!req.files) {
+        res.json({
+            status: false,
+            message: 'No file uploaded'
+        });
+    } else {
+        let data = []; 
 
-              //push file details
-              data.push({
-                  name: photo.name,
-                  mimetype: photo.mimetype,
-                  size: photo.size
-              });
-          });
-  
-          //return response
-          res.json({
-              status: true,
-              message: 'Files are uploaded',
-              data: data
-          });
-      }
-  } catch (err) {
-      res.status(500).json(err);
-  }
+        //loop all files
+        _.forEach(_.keysIn(req.files.photos), (key) => {
+            let photo = req.files.photos[key];
+            
+            //move photo to uploads directory
+            photo.mv('./uploads/' + photo.name);
+
+            //push file details
+            data.push({
+                name: photo.name,
+                mimetype: photo.mimetype,
+                size: photo.size
+            });
+        });
+
+        //return response
+        res.json({
+            status: true,
+            message: 'Files are uploaded',
+            data: data
+        });
+    }
+} catch (err) {
+    res.status(500).json(err);
+}
 });
 /*--------------------------*/
 
