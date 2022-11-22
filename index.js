@@ -158,7 +158,7 @@ app.get("/", (req, res) => {
 
 // app.use("/cart", require(__dirname + "/routes/cart"));
 
-// app.use("/member", require(__dirname + "/routes/member"));
+// app.use("/users", require(__dirname + "/routes/users"));
 
  app.use("/food", require(__dirname + "/routes/food"));
 
@@ -166,7 +166,7 @@ app.use("/itinerary", require(__dirname + "/routes/itinerary"));
 
 app.use("/site", require(__dirname + "/routes/site"));
 
-// app.use("/stays", require(__dirname + "/routes/stays"));
+app.use("/hotel", require(__dirname + "/routes/hotel"));
 
 // app.use("/ticket", require(__dirname + "/routes/ticket"));
 
