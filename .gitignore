@@ -1,4 +1,5 @@
-# .env
+.env
+/modules/db_connect2
 /public/imgs
 /uploads
 /data

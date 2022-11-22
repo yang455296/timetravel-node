@@ -158,7 +158,7 @@ app.get("/", (req, res) => {
 
 // app.use("/cart", require(__dirname + "/routes/cart"));
 
-// app.use("/users", require(__dirname + "/routes/users"));
+app.use("/member", require(__dirname + "/routes/member"));
 
  app.use("/food", require(__dirname + "/routes/food"));
 
