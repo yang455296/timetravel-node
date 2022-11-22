@@ -16,26 +16,23 @@ router.use((req, res, next) => {
 // 列表CRUD+細節CRUD
 // C 資料寫死，要改寫成從前端來
 router.get("/api/signin", async (req, res) => {
-  const sid = 12;
   const userID = "US21";
   const username = "花枝"; 
   const email = "eee@email.com"; 
   const password_hash = "lasdkf39485349hflskdfsdklfsk"; 
-  const verification_sid = 1; 
   
   const sql =
-  "INSERT INTO `member_information`(`sid`, `userID`, `username`, `email`, `password_hash`, `login_time`,`verification_sid `,`creating_time`) VALUES (?, ?, ?, ?, ?, NOW(), ?, ?, NOW())"
+
+  "INSERT INTO `member_information`(`userID`, `username`, `email`, `password_hash`, `login_time`,`creating_time`) VALUES ( ?, ?, ?, ?, NOW(), NOW())"
   const [result] = await db.query(sql, [
-    sid,
     userID,
     username,
     email,
-    password_hash,
-    verification_sid
+    password_hash
   ]);
   res.json(result);
 });
-router.post("/api/addlist", async (req, res) => {
+router.post("/api/information", async (req, res) => {
   // res.json(req.body);
   const output = {
     success: false,
@@ -44,14 +41,12 @@ router.post("/api/addlist", async (req, res) => {
     postData: req.body, //除錯用
   };
   const sql =
-  "INSERT INTO `itinerary`(`member_sid`, `list_number`, `list_name`, `day`, `date`, `status`, `created_date`) VALUES (?, ?, ?, ?, ?, ?, NOW())"
+  "SELECT * FROM `member_information"
   const [result] = await db.query(sql, [
-    req.body.member_sid,
-    req.body.list_number,
-    req.body.list_name,
-    req.body.day || 1,
-    req.body.date,
-    req.body.status,
+    req.body.userID,
+    req.body.username,
+    req.body.email,
+    req.body.password_hash,
   ]);
 
   if (result.affectedRows) output.success = true;
@@ -59,8 +54,8 @@ router.post("/api/addlist", async (req, res) => {
 });
 
 // R 
-router.get(["/api/list"], async (req, res) => {
-  const [rows] = await db.query("SELECT * FROM `itinerary` WHERE 1");
+router.get(["/api/memberlist"], async (req, res) => {
+  const [rows] = await db.query("SELECT * FROM `member_information` WHERE 1");
   res.json(rows);
   //不做分頁
 });
