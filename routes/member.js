@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const db = require(__dirname + "/../modules/db_connect2");
+
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 // CRUD都要，也要登入
@@ -116,23 +118,24 @@ router.get(["/api/memberlist"], async (req, res) => {
 
 
 //login
-router.post('/login-api', async (req, res)=>{
+router.post('/api/login-api', async (req, res)=>{
   const output = {
       success: false,
       error: '帳密錯誤',
       postData: req.body, // 除錯用
       auth: {}
   };
-
+  //console.log(req.body);
   const sql = "SELECT * FROM member_information WHERE email=?";
   const [rows] = await db.query(sql, [req.body.email]);
-  console.log(rows);
+  
   if(! rows.length){
       return res.json(output);
   }
   const row = rows[0];
-
+  //console.log(row,req.body.password)
   output.success = await bcrypt.compare(req.body.password, row['password_hash']);
+  //console.log(output)
   if(output.success){
       output.error = '';
       const {sid, email} = row;
@@ -143,6 +146,7 @@ router.post('/login-api', async (req, res)=>{
           token
       }
   } 
+  //console.log(output)
   res.json(output);
 });
 
