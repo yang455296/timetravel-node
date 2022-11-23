@@ -77,6 +77,20 @@ where hotel.sid = ?`
   res.json(data)
 })
 
+router.get('/item/:sid/hotelComment',async(req,res)=>{
+  // const sql = `SELECT * FROM hotel
+  // JOIN hotel_room on hotel.product_number = hotel_room.product_number
+  // where hotel.sid = ?`;
+  const sql = `SELECT member_information.username,commit_hotel.commit_text,commit_hotel.score,commit_hotel.create_time FROM commit_hotel
+  JOIN hotel on hotel.product_number = commit_hotel.product_number
+	JOIN member_information on member_information.sid = commit_hotel.userID
+    where hotel.sid = ?
+`
+  const [data] = await db.query(sql,[req.params.sid])
+  // res.json(data.length)
+  res.json(data)
+})
+
 
 
 router.get(["/api", "/api/list"], async (req, res) => {

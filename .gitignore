@@ -1,6 +1,7 @@
 .env
 /modules/db_connect2
 /public/imgs
+/public/uploads
 /uploads
 /data
 /node_modules
