@@ -92,29 +92,29 @@ router.get(["/api/memberlist"], async (req, res) => {
 //   res.json({ success: !!result.affectedRows, result });
 // });
 
-// // C
-// router.post("/api/additem", async (req, res) => {
-//   // res.json(req.body);
-//   const output = {
-//     success: false,
-//     code: 0,
-//     error: {},
-//     postData: req.body, //除錯用
-//   };
-//   const sql =
-//   "INSERT INTO `itinerary_detail`(`list_number`, `day`, `sequence`, `category`, `category_id`, `time`, `created_date`) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())"
-//   const [result] = await db.query(sql, [
-//     req.body.list_number,
-//     req.body.day,
-//     req.body.sequence,
-//     req.body.category,
-//     req.body.category_id,
-//     req.body.time,
-//   ]);
+// signin
+router.post("/api/signin", async (req, res) => {
+  // res.json(req.body);
+  const output = {
+    success: false,
+    code: 0,
+    error: {},
+    postData: req.body, //除錯用
+  };
+  const sql =
+  "INSERT INTO `member_information`(`list_number`, `day`, `sequence`, `category`, `category_id`, `time`, `created_date`) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())"
+  const [result] = await db.query(sql, [
+    req.body.list_number,
+    req.body.day,
+    req.body.sequence,
+    req.body.category,
+    req.body.category_id,
+    req.body.time,
+  ]);
 
-//   if (result.affectedRows) output.success = true;
-//   res.json(output);
-// });
+  if (result.affectedRows) output.success = true;
+  res.json(output);
+});
 
 
 //login
