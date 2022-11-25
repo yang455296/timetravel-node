@@ -153,7 +153,7 @@ router.post('/api/login-api', async (req, res)=>{
 // // R 
 // router.get(["/api/item/:list_number"], async (req, res) => {
 //   const sql = "SELECT * FROM `itinerary_detail` WHERE list_number=? ";
-//   const [result] = await db.query(sql, [req.params.list_number]); //TODO
+//   const [result] = await db.query(sql, [req.params.list_number]); 
 //   res.json(result);
 //   //不做分頁
 // });
@@ -167,7 +167,7 @@ router.post('/api/login-api', async (req, res)=>{
 //     postData: req.body, //除錯用
 //   };
 //   const sql =
-//     "UPDATE `itinerary_detail` SET `day` = ?, `sequence` = ?, `category` = ?, `category_id` = ?, `time` = ? WHERE `sid`= ?"; //TODO
+//     "UPDATE `itinerary_detail` SET `day` = ?, `sequence` = ?, `category` = ?, `category_id` = ?, `time` = ? WHERE `sid`= ?"; 
 //   const [result] = await db.query(sql, [
 //     req.body.day,
 //     req.body.sequence,
