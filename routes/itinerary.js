@@ -58,11 +58,16 @@ router.post("/api/addlist", async (req, res) => {
 });
 
 // R 
+router.get(["/api/list/:list_number"], async (req, res) => {
+  const [rows] = await db.query("SELECT * FROM `itinerary` WHERE list_number=?",[req.params.list_number]);
+  res.json(rows);
+});
 router.get(["/api/list"], async (req, res) => {
   const [rows] = await db.query("SELECT * FROM `itinerary` WHERE 1");
   res.json(rows);
   //不做分頁
 });
+
 
 // U
 router.put("/api/editlist/:sid", async (req, res) => {
@@ -119,7 +124,8 @@ router.post("/api/additem", async (req, res) => {
 
 // R 
 router.get(["/api/item/:list_number"], async (req, res) => {
-  const sql = "SELECT * FROM `itinerary_detail` WHERE list_number=? ";
+  const sql = 
+  "SELECT * FROM `itinerary_detail` JOIN site ON itinerary_detail.category_id=site.sid JOIN area ON site.area_sid=area.area_sid JOIN city ON area.city_sid=city.city_sid  WHERE list_number=?  ORDER BY `itinerary_detail`.`day`,`itinerary_detail`.`sequence` ASC"
   const [result] = await db.query(sql, [req.params.list_number]); //TODO
   res.json(result);
   //不做分頁
