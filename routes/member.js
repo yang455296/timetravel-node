@@ -93,7 +93,7 @@ router.get(["/api/memberlist"], async (req, res) => {
 // });
 
 // signin
-router.post("/api/signin", async (req, res) => {
+router.post("/api/signin-api", async (req, res) => {
   // res.json(req.body);
   const output = {
     success: false,
@@ -102,14 +102,11 @@ router.post("/api/signin", async (req, res) => {
     postData: req.body, //除錯用
   };
   const sql =
-  "INSERT INTO `member_information`(`list_number`, `day`, `sequence`, `category`, `category_id`, `time`, `created_date`) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())"
+  "INSERT INTO `member_information`(`username`, `email`, `password_hash`) VALUES (?, ?, ?)"
   const [result] = await db.query(sql, [
-    req.body.list_number,
-    req.body.day,
-    req.body.sequence,
-    req.body.category,
-    req.body.category_id,
-    req.body.time,
+    req.body.username,
+    req.body.email,
+    req.body.password
   ]);
 
   if (result.affectedRows) output.success = true;
