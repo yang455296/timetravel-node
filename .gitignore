@@ -2,6 +2,8 @@
 /modules/db_connect2
 /public/imgs
 /uploads
+/public/uploads
 /data
 /node_modules
 .vscode
+note.txt
