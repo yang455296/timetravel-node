@@ -64,33 +64,27 @@ router.get(["/api/memberlist"], async (req, res) => {
 });
 
 // U
-// router.put("/api/editlist/:sid", async (req, res) => {
-//   const output = {
-//     success: false,
-//     code: 0,
-//     error: {},
-//     postData: req.body, //除錯用
-//   };
-//   const sql =
-//     "UPDATE `itinerary` SET `list_name` = ?, `day` = ?, `date` = ? WHERE `sid` = ?";
-//   const [result] = await db.query(sql, [
-//     req.body.list_name,
-//     req.body.day,
-//     req.body.date,
-//     req.body.sid,
-//   ]);
-
-//   // console.log(result);
-//   // if(result.affectedRows) output.success = true;
-//   if (result.changedRows) output.success = true;
-//   res.json(output);
-// });
-// // D
-// router.delete("/api/dellist/:sid", async (req, res) => {
-//   const sql = "DELETE FROM itinerary WHERE sid=? ";
-//   const [result] = await db.query(sql, [req.params.sid]);
-//   res.json({ success: !!result.affectedRows, result });
-// });
+router.put("/api/edit-member-api", async (req, res) => {
+  const output = {
+    success: false,
+    code: 0,
+    error: {},
+    postData: req.body, //除錯用
+  };
+  const sql =
+    "UPDATE `member_information` SET `username` = ?, `telephone` = ? WHERE `sid` = ?";
+  const [result] = await db.query(sql, [
+    req.body.username,
+    //req.body.member_img,
+    req.body.telephone,
+    req.body.sid,
+  ]);
+  
+  console.log(result);
+  // if(result.affectedRows) output.success = true;
+  if (result.changedRows) output.success = true;
+  res.json(output);
+});
 
 // signin
 router.post("/api/signin-api", async (req, res) => {
@@ -106,8 +100,10 @@ router.post("/api/signin-api", async (req, res) => {
   const [result] = await db.query(sql, [
     req.body.username,
     req.body.email,
-    req.body.password
+    bcrypt.hashSync(req.body.password,10),
+    
   ]);
+  console.log(req.body.password);
 
   if (result.affectedRows) output.success = true;
   res.json(output);
@@ -130,9 +126,9 @@ router.post('/api/login-api', async (req, res)=>{
       return res.json(output);
   }
   const row = rows[0];
-  //console.log(row,req.body.password)
-  output.success = await bcrypt.compare(req.body.password, row['password_hash']);
-  //console.log(output)
+  
+  output.success = bcrypt.compareSync(req.body.password, row['password_hash']);
+  
   if(output.success){
       output.error = '';
       const {sid, email} = row;
@@ -143,6 +139,7 @@ router.post('/api/login-api', async (req, res)=>{
           token
       }
   } 
+  console.log();
   //console.log(output)
   res.json(output);
 });
