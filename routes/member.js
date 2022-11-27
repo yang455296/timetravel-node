@@ -112,6 +112,15 @@ router.post('/upload-avatar', async (req, res) => {
                   size: avatar.size
               }
           });
+          const sql =
+            "UPDATE `member_information` SET `member_img` = ? WHERE `sid` = ?";
+          const [result] = await db.query(sql, [
+              req.body.avatar,
+              req.body.sid,
+            ]);
+            if (result.changedRows) output.success = true;
+            res.json(output);
+            //有錯誤
       }
   } catch (err) {
       res.status(500).json(err);
