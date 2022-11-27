@@ -63,7 +63,7 @@ router.get(["/api/memberlist"], async (req, res) => {
   //不做分頁
 });
 
-// U
+// Profile
 router.put("/api/edit-member-api", async (req, res) => {
   const output = {
     success: false,
@@ -75,7 +75,6 @@ router.put("/api/edit-member-api", async (req, res) => {
     "UPDATE `member_information` SET `username` = ?, `telephone` = ? WHERE `sid` = ?";
   const [result] = await db.query(sql, [
     req.body.username,
-    //req.body.member_img,
     req.body.telephone,
     req.body.sid,
   ]);
@@ -85,6 +84,40 @@ router.put("/api/edit-member-api", async (req, res) => {
   if (result.changedRows) output.success = true;
   res.json(output);
 });
+
+// ResetPassword
+router.post("/api/reset-password-member-api", async (req, res) => {
+  const output = {
+    success: false,
+    code: 0,
+    error: {},
+    postData: req.body, //除錯用
+  };
+  const sql1= "SELECT * FROM member_information WHERE sid=?";
+  const [rows] = await db.query(sql1, [req.body.sid]);
+  
+  if(! rows.length){
+      return res.json(output);
+  }
+  const row = rows[0];
+  
+  output.success = bcrypt.compareSync(req.body.oldPassword, row['password_hash']);
+  
+  if(output.success){
+    output.error = '';
+    const sql = 
+    "UPDATE `member_information` SET `password_hash` = ? WHERE `sid` = ?";
+    const [result] = await db.query(sql, [
+      bcrypt.hashSync(req.body.newPassword,10),
+      req.body.sid,
+    ]);
+    if (result.affectedRows) output.success = true;
+} else{
+  //return ("舊密碼錯誤")
+}
+    res.json(output);
+  });
+
 
 // signin
 router.post("/api/signin-api", async (req, res) => {
@@ -103,7 +136,7 @@ router.post("/api/signin-api", async (req, res) => {
     bcrypt.hashSync(req.body.password,10),
     
   ]);
-  console.log(req.body.password);
+  //console.log(req.body.password);
 
   if (result.affectedRows) output.success = true;
   res.json(output);
@@ -139,7 +172,6 @@ router.post('/api/login-api', async (req, res)=>{
           token
       }
   } 
-  console.log();
   //console.log(output)
   res.json(output);
 });
