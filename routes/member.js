@@ -5,6 +5,8 @@ const db = require(__dirname + "/../modules/db_connect2");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+const upload = require(__dirname + "/../modules/upload-img");
+
 // CRUD都要，也要登入
 
 router.use((req, res, next) => {
@@ -56,14 +58,14 @@ router.use((req, res, next) => {
 //   res.json(output);
 // });
 
-// R 
+// --------R---------取得會員資料
 router.get(["/api/memberlist"], async (req, res) => {
   const [rows] = await db.query("SELECT * FROM `member_information` WHERE 1");
   res.json(rows);
   //不做分頁
 });
 
-// Profile
+// -------Profile--------會員編輯api
 router.put("/api/edit-member-api", async (req, res) => {
   const output = {
     success: false,
@@ -85,7 +87,38 @@ router.put("/api/edit-member-api", async (req, res) => {
   res.json(output);
 });
 
-// ResetPassword
+// ---------會員大頭上傳api---------
+router.post('/upload-avatar', async (req, res) => {
+  try {
+      if(!req.files) {
+          res.send({
+              status: false,
+              message: 'No file uploaded'
+          });
+      } else {
+          //使用輸入框的名稱來獲取上傳檔案 (例如 "avatar")
+          let avatar = req.files.avatar;
+          
+          //使用 mv() 方法來移動上傳檔案到要放置的目錄裡 (例如 "uploads")
+          avatar.mv('./uploads/Member/' + avatar.name);
+  
+          //送出回應
+          res.json({
+              status: true,
+              message: 'File is uploaded',
+              data: {
+                  name: avatar.name,
+                  mimetype: avatar.mimetype,
+                  size: avatar.size
+              }
+          });
+      }
+  } catch (err) {
+      res.status(500).json(err);
+  }
+  });
+
+// ------------ResetPassword--------------重設密碼api
 router.post("/api/reset-password-member-api", async (req, res) => {
   const output = {
     success: false,
@@ -113,13 +146,13 @@ router.post("/api/reset-password-member-api", async (req, res) => {
     ]);
     if (result.affectedRows) output.success = true;
 } else{
-  //return ("舊密碼錯誤")
+    output.error= '密碼不相同';
 }
     res.json(output);
   });
 
 
-// signin
+// ---------------signin---------------註冊api
 router.post("/api/signin-api", async (req, res) => {
   // res.json(req.body);
   const output = {
@@ -143,7 +176,7 @@ router.post("/api/signin-api", async (req, res) => {
 });
 
 
-//login
+//---------------login----------------登入api
 router.post('/api/login-api', async (req, res)=>{
   const output = {
       success: false,
