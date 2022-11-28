@@ -83,7 +83,8 @@ router.get(["/api/commit/tickets/:sid"], async (req, res) => {
   res.json(data[0]);
 });
 // -------Commit--------會員編輯評論api
-router.put("/api/edit-commit/:sid", async (req, res) => {
+// --------美食-----------
+router.put("/api/edit-commit/food/:sid", async (req, res) => {
   const output = {
     success: false,
     code: 0,
@@ -102,7 +103,46 @@ router.put("/api/edit-commit/:sid", async (req, res) => {
   if (result.changedRows) output.success = true;
   res.json(output);
 });
-
+// --------住宿-----------
+router.put("/api/edit-commit/stay/:sid", async (req, res) => {
+  const output = {
+    success: false,
+    code: 0,
+    error: {},
+    postData: req.body, //除錯用
+  };
+  const sql =
+    "UPDATE `commit_hotel` SET `commit_text` = ?, `create_time` = NOW() WHERE `sid` = ?";
+  const [result] = await db.query(sql, [
+    req.body.commit_text,
+    req.body.sid,
+  ]);
+  
+  console.log(result);
+  // if(result.affectedRows) output.success = true;
+  if (result.changedRows) output.success = true;
+  res.json(output);
+});
+// --------票卷-----------
+router.put("/api/edit-commit/tickets/:sid", async (req, res) => {
+  const output = {
+    success: false,
+    code: 0,
+    error: {},
+    postData: req.body, //除錯用
+  };
+  const sql =
+    "UPDATE `commit_tickets` SET `commit_text` = ?, `create_time` = NOW() WHERE `sid` = ?";
+  const [result] = await db.query(sql, [
+    req.body.commit_text,
+    req.body.sid,
+  ]);
+  
+  console.log(result);
+  // if(result.affectedRows) output.success = true;
+  if (result.changedRows) output.success = true;
+  res.json(output);
+});
 // -------Profile--------會員編輯api
 router.put("/api/edit-member-api", async (req, res) => {
   const output = {
