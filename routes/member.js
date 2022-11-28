@@ -176,7 +176,6 @@ router.post("/api/signin-api", async (req, res) => {
     req.body.username,
     req.body.email,
     bcrypt.hashSync(req.body.password,10),
-    
   ]);
   //console.log(req.body.password);
 
