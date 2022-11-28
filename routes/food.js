@@ -56,7 +56,7 @@ async function getListData(req, res) {
 async function getCommitData(req, res) {
 
   let rows = [];
-    const sql = `SELECT * FROM commit_food JOIN member_information ON commit_food.memberID=member_information.sid `;
+    const sql = `SELECT * FROM commit_food JOIN member_information ON commit_food.userID=member_information.sid `;
     [rows] = await db.query(sql);
   return rows
 }
