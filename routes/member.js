@@ -65,26 +65,43 @@ router.get(["/api/memberlist"], async (req, res) => {
 });
 // --------R---------取得會員評論
 // --------美食-----------
-router.get(["/api/commit/food/:sid"], async (req, res) => {
-  const sql = "SELECT `product_name`,`commit_text`,`score`,`create_time`FROM commit_food JOIN `member_information` ON commit_food.userID=member_information.sid WHERE member_information.sid=?";
-  const [data] = await db.query(sql, [req.params.sid]);
-  res.json(data[0]);
+router.get(["/:sid/comment"], async (req, res) => {
+  const food_sql = "SELECT commit_food.sid as `sid`, `product_name`,`commit_text`,`score`,`create_time`FROM commit_food JOIN `member_information` ON commit_food.userID=member_information.sid WHERE member_information.sid=?";
+  const stay_sql = "SELECT commit_hotel.sid as `sid`, `product_name`,`commit_text`,`score`,`create_time`FROM commit_hotel JOIN `member_information` ON commit_hotel.userID=member_information.sid WHERE member_information.sid=?";
+  const ticket_sql = "SELECT commit_tickets.sid as `sid`,`product_name`,`commit_text`,`score`,`create_time`FROM commit_tickets JOIN `member_information` ON commit_tickets.userID=member_information.sid WHERE member_information.sid=?";
+
+  const data = await Promise.all([
+    db.query(food_sql, [req.params.sid]),
+    db.query(stay_sql, [req.params.sid]),
+    db.query(ticket_sql, [req.params.sid]),
+  ])
+
+  const result = [[] , [], []]
+  data.forEach((item, index) => {
+    const [first, sec] = item;
+    result[index] = result[index].concat(first);
+  })
+  
+  // res.json([]);
+  // const data = await db.query(sql, [req.params.sid]);
+  // console.log(data)
+  res.json(result);
 });
 // --------住宿-----------
-router.get(["/api/commit/stay/:sid"], async (req, res) => {
-  const sql = "SELECT `product_name`,`commit_text`,`score`,`create_time`FROM commit_hotel JOIN `member_information` ON commit_hotel.userID=member_information.sid WHERE member_information.sid=?";
+router.get(["/api/comment/stay/:sid"], async (req, res) => {
+  const sql = "SELECT commit_hotel.sid as `sid`, `product_name`,`commit_text`,`score`,`create_time`FROM commit_hotel JOIN `member_information` ON commit_hotel.userID=member_information.sid WHERE member_information.sid=?";
   const [data] = await db.query(sql, [req.params.sid]);
   res.json(data[0]);
 });
 // --------票卷-----------
-router.get(["/api/commit/tickets/:sid"], async (req, res) => {
-  const sql = "SELECT `sid` , `product_name`,`commit_text`,`score`,`create_time`FROM commit_tickets JOIN `member_information` ON commit_tickets.userID=member_information.sid WHERE member_information.sid=?";
+router.get(["/api/comment/tickets/:sid"], async (req, res) => {
+  const sql = "SELECT commit_tickets.sid as `sid`,`product_name`,`commit_text`,`score`,`create_time`FROM commit_tickets JOIN `member_information` ON commit_tickets.userID=member_information.sid WHERE member_information.sid=?";
   const [data] = await db.query(sql, [req.params.sid]);
   res.json(data[0]);
 });
 // -------Commit--------會員編輯評論api
 // --------美食-----------
-router.put("/api/edit-commit/food/:sid", async (req, res) => {
+router.put("/api/edit-comment/food/:sid", async (req, res) => {
   const output = {
     success: false,
     code: 0,
@@ -104,7 +121,7 @@ router.put("/api/edit-commit/food/:sid", async (req, res) => {
   res.json(output);
 });
 // --------住宿-----------
-router.put("/api/edit-commit/stay/:sid", async (req, res) => {
+router.put("/api/edit-comment/stay/:sid", async (req, res) => {
   const output = {
     success: false,
     code: 0,
@@ -124,7 +141,7 @@ router.put("/api/edit-commit/stay/:sid", async (req, res) => {
   res.json(output);
 });
 // --------票卷-----------
-router.put("/api/edit-commit/tickets/:sid", async (req, res) => {
+router.put("/api/edit-comment/tickets/:sid", async (req, res) => {
   const output = {
     success: false,
     code: 0,
@@ -142,6 +159,25 @@ router.put("/api/edit-commit/tickets/:sid", async (req, res) => {
   // if(result.affectedRows) output.success = true;
   if (result.changedRows) output.success = true;
   res.json(output);
+});
+//--------刪除會員評論----------
+// --------美食-----------
+router.delete("/api/del-comment/food", async (req, res) => {
+  const sql = "DELETE FROM commit_food WHERE sid=? ";
+  const [result] = await db.query(sql, [req.body.sid]);
+  res.json({ success: !!result.affectedRows, result });
+});
+// --------住宿-----------
+router.delete("/api/del-comment/stay", async (req, res) => {
+  const sql = "DELETE FROM commit_hotel WHERE sid=? ";
+  const [result] = await db.query(sql, [req.params.sid]);
+  res.json({ success: !!result.affectedRows, result });
+});
+// --------票卷-----------
+router.delete("/api/del-comment/tickets", async (req, res) => {
+  const sql = "DELETE FROM commit_tickets WHERE sid=? ";
+  const [result] = await db.query(sql, [req.params.sid]);
+  res.json({ success: !!result.affectedRows, result });
 });
 // -------Profile--------會員編輯api
 router.put("/api/edit-member-api", async (req, res) => {
