@@ -156,7 +156,7 @@ app.get("/", (req, res) => {
   res.send("<h1>TimeTravel Node</h1>");
 });
 
-// app.use("/cart", require(__dirname + "/routes/cart"));
+app.use("/cart", require(__dirname + "/routes/cart"));
 
 app.use("/member", require(__dirname + "/routes/member"));
 
