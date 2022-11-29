@@ -170,6 +170,8 @@ app.use("/hotel", require(__dirname + "/routes/hotel"));
 
 app.use("/ticket", require(__dirname + "/routes/ticket"));
 
+app.use("/productAll", require(__dirname + "/routes/productAll"));
+
 app.post("/upload", upload.single("avatar"), async (req, res) => {
   res.json(req.file);
 });
