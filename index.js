@@ -158,6 +158,8 @@ app.get("/", (req, res) => {
 
 app.use("/cart", require(__dirname + "/routes/cart"));
 
+// app.use("/pay", require(__dirname + "/routes/pay"));
+
 app.use("/member", require(__dirname + "/routes/member"));
 
  app.use("/food", require(__dirname + "/routes/food"));

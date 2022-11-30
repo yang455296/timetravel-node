@@ -66,9 +66,9 @@ router.get(["/api/memberlist"], async (req, res) => {
 // --------R---------取得會員評論
 // --------美食-----------
 router.get(["/:sid/comment"], async (req, res) => {
-  const food_sql = "SELECT commit_food.sid as `sid`, `product_name`,`commit_text`,`score`,`create_time`FROM commit_food JOIN `member_information` ON commit_food.userID=member_information.sid WHERE member_information.sid=?";
-  const stay_sql = "SELECT commit_hotel.sid as `sid`, `product_name`,`commit_text`,`score`,`create_time`FROM commit_hotel JOIN `member_information` ON commit_hotel.userID=member_information.sid WHERE member_information.sid=?";
-  const ticket_sql = "SELECT commit_tickets.sid as `sid`,`product_name`,`commit_text`,`score`,`create_time`FROM commit_tickets JOIN `member_information` ON commit_tickets.userID=member_information.sid WHERE member_information.sid=?";
+  const food_sql = "SELECT `product_number`, `product_name`,`commit_text`,`score`,`create_time`FROM commit_food JOIN `member_information` ON commit_food.userID=member_information.sid WHERE member_information.sid=?";
+  const stay_sql = "SELECT `product_number`, `product_name`,`commit_text`,`score`,`create_time`FROM commit_hotel JOIN `member_information` ON commit_hotel.userID=member_information.sid WHERE member_information.sid=?";
+  const ticket_sql = "SELECT `product_number`,`product_name`,`commit_text`,`score`,`create_time`FROM commit_tickets JOIN `member_information` ON commit_tickets.userID=member_information.sid WHERE member_information.sid=?";
 
   const data = await Promise.all([
     db.query(food_sql, [req.params.sid]),
@@ -101,19 +101,40 @@ router.get(["/:sid/comment"], async (req, res) => {
 // });
 // -------Commit--------會員編輯評論api
 // --------美食-----------
-router.put("/api/edit-comment/food/:sid", async (req, res) => {
+router.put("/:sid/:product_number/edi-comment", async (req, res) => {
   const output = {
     success: false,
     code: 0,
     error: {},
     postData: req.body, //除錯用
   };
-  const sql =
-    "UPDATE `commit_food` SET `commit_text` = ?, `create_time` = NOW() WHERE `sid` = ?";
-  const [result] = await db.query(sql, [
-    req.body.commit_text,
-    req.body.sid,
-  ]);
+  const edit_food_sql =
+    "UPDATE `commit_food` SET `commit_text` = ?, `create_time` = NOW() WHERE `product_number` = ?";
+  const edit_stay_sql =
+    "UPDATE `commit_hotel` SET `commit_text` = ?, `create_time` = NOW() WHERE `product_number` = ?";
+  const edit_tickets_sql =
+    "UPDATE `commit_tickets` SET `commit_text` = ?, `create_time` = NOW() WHERE `product_number` = ?";
+
+  const data = await Promise.all([
+    db.query(edit_food_sql, [
+      req.body.commit_text,
+      req.params.product_number
+    ]),
+    db.query(edit_stay_sql, [
+      req.body.commit_text,
+      req.params.product_number
+    ]),
+    db.query(edit_tickets_sql, [
+      req.body.commit_text,
+      req.params.product_number
+    ]),
+  ])
+  const result = [[] , [], []]
+
+  data.forEach((item, index) => {
+    const [first, sec] = item;
+    result[index] = result[index].concat(first);
+  })
   
   console.log(result);
   // if(result.affectedRows) output.success = true;
