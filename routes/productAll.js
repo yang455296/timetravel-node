@@ -6,7 +6,9 @@ const db = require(__dirname + "/../modules/db_connect2");
 router.use((req, res, next) => {
   next();
 });
-//TODO:商品名稱、商品縣市名、商品價錢、商品收藏數
+
+
+
 async function getAllListData(req, res) {
   const perPage = 12;
     //當前的page＝搜尋的page如果不是就是第一頁
@@ -34,98 +36,96 @@ async function getAllListData(req, res) {
   // 分頁功能
   const [foodTotalRows]= await db.query(food_t_sql)
   const [siteTotalRows] = await db.query(site_t_sql);
-  const [hotelTotalRows] = await db.query(hotel_t_sql);
-  const [ticketTotalRows] = await db.query(ticket_t_sql);
-  const allTotalRows = foodTotalRows[0].totalRows + siteTotalRows[0].totalRows+hotelTotalRows[0].totalRows+ticketTotalRows[0].totalRows
+  const[hotelTotalRows]= await db.query(hotel_t_sql);
+  const [ticketTotalRows]= await db.query(ticket_t_sql);
+//     console.log( [foodTotalRows])
+// console.log([siteTotalRows])
+  // //算出總筆數
+   const allTotalRows = foodTotalRows[0].totalRows+hotelTotalRows[0].totalRows+siteTotalRows[0].totalRows+ticketTotalRows[0].totalRows
 
+  //  .concat(siteTotalRows,hotelTotalRows,ticketTotalRows)
+
+   console.log([[{allTotalRows}]])
+  //  + siteTotalRows[0].totalRows +hotelTotalRows[0].totalRows+ticketTotalRows[0].totalRows;
+  // // let allTotalPages = 0;
+  // const [[{allTotalRows}]] = foodTotalRows + siteTotalRows+hotelTotalRows+ticketTotalRows;
   let allTotalPages = 0;
+
   let allRows = []
   let foodRows=[];
   let siteRows=[];
   let hotelRows=[];
   let ticketRows=[];
 
-
   if (allTotalRows > 0) {
-    allTotalPages = Math.ceil(allTotalRows / perPage);
-    if (page > allTotalPages) {
-      return res.redirect(`?page=${allTotalPages}`);
-    }
+    // //算出總頁數＝總筆數/分頁
+    // allTotalPages = Math.ceil(allTotalRows / perPage);
+    // if (page > allTotalPages) {
+    //   return res.redirect(`?page=${allTotalPages}`);
+    // }
     const foodsql = `SELECT * FROM food_product_all 
     JOIN food_categories ON food_product_all.categories_sid=food_categories.categories_sid
     JOIN area ON food_product_all.area_sid=area.area_sid 
     JOIN city ON food_product_all.city_sid=city.city_sid
-    ORDER BY sid `;
+    ORDER BY sid  `;
     
 
     const sitesql = `SELECT * FROM site 
     JOIN site_categories ON site.site_category_sid=site_categories.site_category_sid 
     JOIN area ON site.area_sid=area.area_sid 
     JOIN city ON area.city_sid=city.city_sid 
-    ORDER BY sid`;
+    ORDER BY sid `;
 
 
     const hotelsql = `SELECT * FROM hotel 
     JOIN hotel_categories ON hotel.categories_sid=hotel_categories.hotel_categories_sid 
     JOIN area ON hotel.area_sid=area.area_sid 
     JOIN city ON area.city_sid=city.city_sid
-    ORDER BY sid`;
+    ORDER BY sid `;
 
 
     const ticketsql = `SELECT * FROM tickets 
     JOIN tickets_categories ON tickets.categories_id=tickets_categories.id
     JOIN area ON tickets.cities_id=area.area_sid 
-    JOIN city ON area.city_sid=city.city_sid  ORDER BY sid`;
+    JOIN city ON area.city_sid=city.city_sid ${where} ORDER BY sid DESC  `;
     
 
     [foodRows] = await db.query(foodsql);
     [siteRows] = await db.query(sitesql);
     [hotelRows] = await db.query(hotelsql);
     [ticketRows] = await db.query(ticketsql);
-     allRows = foodRows.concat(siteRows,hotelRows,ticketRows)
-    
+    allRows = foodRows.concat(siteRows,hotelRows,ticketRows)
   }
-  return {
-    allTotalRows,
-    allTotalPages,
-    perPage,
-    page,
-    allRows
-    // query:req.query
-   };
+  //分頁從前端處理
+  return allRows
 }
 
-
-
-// R
-// router.get("/item/:sid", async (req, res) => {
-//   const sql = `SELECT * FROM food_product_all JOIN food_categories ON food_product_all.categories_sid=food_categories.categories_sid JOIN area ON food_product_all.area_sid=area.area_sid JOIN city ON food_product_all.city_sid=city.city_sid WHERE sid=?`
-//  // const sql = "SELECT * FROM food_product_all WHERE sid=? ";
-//   const [data] = await db.query(sql, [req.params.sid]);
-//   res.json(data[0]);
-// }); //單筆資料http://localhost:3001/site/item/12
-
-// //取得評論的資料
-// async function getCommitData(req, res) {
-
-//   let rows = [];
-//     const sql = `SELECT * FROM commit_food JOIN member_information ON commit_food.userID =member_information.sid `;
-//     [rows] = await db.query(sql);
-//   return rows
-// }
-
-// router.get(["/commit", "/food/detail/commit"], async (req, res) => {
-//   res.json(await getCommitData(req, res));
-// });
-
-
-
-
-
-
+//取得所有商品資料
 router.get(["/api", "/api/list"], async (req, res) => {
   res.json(await getAllListData(req, res));
 });
 
+//TODO:從前端接收收藏資訊的api(notfinish)
+router.post(["/api/addCollect-api"],async(req,res)=>{
+  const output={
+    success:false,
+    code:0,
+    error:{},
+    postData:req.body,//除錯
+  }
+
+
+  const sql = "INSERT INTO `member_food_collect`(`sid`, `member_sid`, `food_product_sid`) VALUES ('?','?','?') "
+
+  const [result] = await db.query(sql, [
+    req.body.username,
+    req.body.email,
+    bcrypt.hashSync(req.body.password,10),
+  ]);
+  //console.log(req.body.password);
+
+  if (result.affectedRows) output.success = true;
+  res.json(output);
+})
 
 module.exports = router;
