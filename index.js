@@ -156,7 +156,9 @@ app.get("/", (req, res) => {
   res.send("<h1>TimeTravel Node</h1>");
 });
 
-// app.use("/cart", require(__dirname + "/routes/cart"));
+app.use("/cart", require(__dirname + "/routes/cart"));
+
+// app.use("/pay", require(__dirname + "/routes/pay"));
 
 app.use("/member", require(__dirname + "/routes/member"));
 
@@ -169,6 +171,8 @@ app.use("/site", require(__dirname + "/routes/site"));
 app.use("/hotel", require(__dirname + "/routes/hotel"));
 
 app.use("/ticket", require(__dirname + "/routes/ticket"));
+
+app.use("/productAll", require(__dirname + "/routes/productAll"));
 
 app.post("/upload", upload.single("avatar"), async (req, res) => {
   res.json(req.file);
