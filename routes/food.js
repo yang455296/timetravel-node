@@ -52,11 +52,22 @@ async function getListData(req, res) {
     query: req.query,
   };
 }
+
+
+
+// R
+router.get("/item/:sid", async (req, res) => {
+  const sql = `SELECT * FROM food_product_all JOIN food_categories ON food_product_all.categories_sid=food_categories.categories_sid JOIN area ON food_product_all.area_sid=area.area_sid JOIN city ON food_product_all.city_sid=city.city_sid WHERE sid=?`
+ // const sql = "SELECT * FROM food_product_all WHERE sid=? ";
+  const [data] = await db.query(sql, [req.params.sid]);
+  res.json(data[0]);
+}); //單筆資料http://localhost:3001/site/item/12
+
 //取得評論的資料
 async function getCommitData(req, res) {
 
   let rows = [];
-    const sql = `SELECT * FROM commit_food JOIN member_information ON commit_food.userID=member_information.sid `;
+    const sql = `SELECT * FROM commit_food JOIN member_information ON commit_food.userID =member_information.sid `;
     [rows] = await db.query(sql);
   return rows
 }
@@ -65,13 +76,9 @@ router.get(["/commit", "/food/detail/commit"], async (req, res) => {
   res.json(await getCommitData(req, res));
 });
 
-// R
-router.get("/item/:sid", async (req, res) => {
-  const sql = "SELECT * FROM food_product_all JOIN food_categories ON food_product_all.categories_sid=food_categories.categories_sid JOIN area ON food_product_all.area_sid=area.area_sid JOIN city ON food_product_all.city_sid=city.city_sid WHERE sid=?"
-  // const sql = "SELECT * FROM food_product_all WHERE sid=? ";
-  const [data] = await db.query(sql, [req.params.sid]);
-  res.json(data[0]);
-}); //單筆資料http://localhost:3001/site/item/12
+
+
+
 
 
 router.get(["/api", "/api/list"], async (req, res) => {

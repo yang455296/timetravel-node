@@ -60,21 +60,21 @@ router.get("/item/:sid", async (req, res) => {
   JOIN area ON tickets.cities_id=area.area_sid 
   JOIN city ON area.city_sid=city.city_sid
   WHERE sid=?  `;
-  
+
   const [data] = await db.query(sql, [req.params.sid]);
   res.json(data[0]);
 }); //單筆資料http://localhost:3001/site/item/12
 
 
-
-router.get('/item/:sid/hotelComment',async(req,res)=>{
+// 拿評論
+router.get('/item/:sid/ticketComment',async(req,res)=>{
   // const sql = `SELECT * FROM hotel
   // JOIN hotel_room on hotel.product_number = hotel_room.product_number
   // where hotel.sid = ?`;
-  const sql = `SELECT member_information.username,commit_hotel.commit_text,commit_hotel.score,commit_hotel.create_time FROM commit_hotel
-  JOIN hotel on hotel.product_number = commit_hotel.product_number
-	JOIN member_information on member_information.sid = commit_hotel.userID
-    where hotel.sid = ?
+  const sql = `SELECT member_information.username,commit_tickets.commit_text,commit_tickets.score,commit_tickets.create_time FROM commit_tickets
+  JOIN tickets on tickets.product_number = commit_tickets.product_number
+	JOIN member_information on member_information.sid = commit_tickets.userID
+    where tickets.sid = ?
 `
   const [data] = await db.query(sql,[req.params.sid])
   // res.json(data.length)

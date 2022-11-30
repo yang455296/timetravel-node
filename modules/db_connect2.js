@@ -9,5 +9,13 @@ const pool = mysql.createPool({
     waitForConnections: true,
     connectionLimit: 10,  // 最大連線數
     queueLimit: 0 //不限制排隊數量
+    // host: process.env.DB_HOST || 'localhost',
+    // user: process.env.DB_USER || 'root',
+    // password: process.env.DB_PASS || '',
+    // database: process.env.DB_NAME || 'ProjectAtHome2',
+    // port:'3306',
+    // waitForConnections: true,
+    // connectionLimit: 10,  // 最大連線數
+    // queueLimit: 0 //不限制排隊數量
 });
 module.exports = pool.promise();  // 滙出promise pool
