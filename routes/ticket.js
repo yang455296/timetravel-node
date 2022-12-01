@@ -37,7 +37,8 @@ async function getListData(req, res) {
     const sql = `SELECT * FROM tickets 
     JOIN tickets_categories ON tickets.categories_id=tickets_categories.id
     JOIN area ON tickets.cities_id=area.area_sid 
-    JOIN city ON area.city_sid=city.city_sid ${where} ORDER BY sid LIMIT ${
+    JOIN city ON area.city_sid=city.city_sid 
+    ${where} ORDER BY sid LIMIT ${
       (page - 1) * perPage
     }, ${perPage} `;
     [rows] = await db.query(sql);
@@ -54,6 +55,7 @@ async function getListData(req, res) {
 }
 
 // R
+// 取商品資料大項
 router.get("/item/:sid", async (req, res) => {
   const sql = `SELECT * FROM tickets 
   JOIN tickets_categories ON tickets.categories_id=tickets_categories.id
@@ -66,7 +68,22 @@ router.get("/item/:sid", async (req, res) => {
 }); //單筆資料http://localhost:3001/site/item/12
 
 
-// 拿評論
+// 取票種價錢
+router.get('/item/:sid/types',async(req,res)=>{
+  // const sql = `SELECT * FROM hotel
+  // JOIN hotel_room on hotel.product_number = hotel_room.product_number
+  // where hotel.sid = ?`;
+  const sql = `SELECT tickets_types.tickets_types,tickets_types.product_price,tickets_types FROM tickets_types
+  JOIN tickets on tickets.product_number = tickets_types.product_number
+  where tickets.sid= ?`
+
+  const [data] = await db.query(sql,[req.params.sid])
+  // res.json(data.length)
+  res.json(data)
+})
+
+
+// 取評論
 router.get('/item/:sid/ticketComment',async(req,res)=>{
   // const sql = `SELECT * FROM hotel
   // JOIN hotel_room on hotel.product_number = hotel_room.product_number
@@ -80,6 +97,7 @@ router.get('/item/:sid/ticketComment',async(req,res)=>{
   // res.json(data.length)
   res.json(data)
 })
+
 
 
 
