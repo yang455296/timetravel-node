@@ -41,6 +41,11 @@ async function getListData(req, res) {
       (page - 1) * perPage
     }, ${perPage} `;
     [rows] = await db.query(sql);
+    const sql2 = `SELECT * FROM food_product_all 
+    JOIN food_categories ON food_product_all.categories_sid=food_categories.categories_sid
+    JOIN area ON food_product_all.area_sid=area.area_sid 
+    JOIN city ON food_product_all.city_sid=city.city_sid ${where} ORDER BY sid DESC `;
+    [rowsAll] = await db.query(sql2);
   }
   return {
     totalRows,
@@ -48,6 +53,7 @@ async function getListData(req, res) {
     perPage,
     page,
     rows,
+    rowsAll,
     search,
     query: req.query,
   };

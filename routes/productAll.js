@@ -36,7 +36,7 @@ async function getAllListData(req, res) {
   // 分頁功能
   const [foodTotalRows]= await db.query(food_t_sql)
   const [siteTotalRows] = await db.query(site_t_sql);
-  const[hotelTotalRows]= await db.query(hotel_t_sql);
+  const [hotelTotalRows]= await db.query(hotel_t_sql);
   const [ticketTotalRows]= await db.query(ticket_t_sql);
 //     console.log( [foodTotalRows])
 // console.log([siteTotalRows])
@@ -107,6 +107,7 @@ router.get(["/api", "/api/list"], async (req, res) => {
 
 //TODO:從前端接收收藏資訊的api(notfinish)
 router.post(["/api/addCollect-api"],async(req,res)=>{
+  
   const output={
     success:false,
     code:0,
@@ -118,9 +119,9 @@ router.post(["/api/addCollect-api"],async(req,res)=>{
   const sql = "INSERT INTO `member_food_collect`(`sid`, `member_sid`, `food_product_sid`) VALUES ('?','?','?') "
 
   const [result] = await db.query(sql, [
-    req.body.username,
-    req.body.email,
-    bcrypt.hashSync(req.body.password,10),
+    req.body.sid,
+    req.body.member_sid,
+    req.body.food_product_sid,
   ]);
   //console.log(req.body.password);
 
