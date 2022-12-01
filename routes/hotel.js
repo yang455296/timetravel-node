@@ -48,14 +48,16 @@ async function getListData(req, res) {
     JOIN area ON hotel.area_sid=area.area_sid 
     JOIN city ON area.city_sid=city.city_sid
     JOIN hotel_room on hotel_room.product_number = hotel.product_number
-    WHERE 1 GROUP BY hotel.product_number  LIMIT ${
+    ${where} GROUP BY hotel.product_number  LIMIT ${
       (page - 1) * perPage
     }, ${perPage} `;
 
     const sqlAll = `SELECT * FROM hotel 
     JOIN hotel_categories ON hotel.categories_sid=hotel_categories.hotel_categories_sid 
     JOIN area ON hotel.area_sid=area.area_sid 
-    JOIN city ON area.city_sid=city.city_sid ${where} ORDER BY sid `;
+    JOIN city ON area.city_sid=city.city_sid 
+    JOIN hotel_room on hotel_room.product_number = hotel.product_number
+    ${where} GROUP BY hotel.product_number `;
 
     const sqlFilter = `SELECT hotel.product_name ,area.area_name FROM hotel 
     JOIN area on area.area_sid = hotel.area_sid
@@ -72,7 +74,7 @@ async function getListData(req, res) {
 
     [rows] = await db.query(sql);
     [rowsAll] = await db.query(sqlAll);
-    [filterRow] = await db.query(sqlFilter);
+    // [filterRow] = await db.query(sqlFilter);
   }
   return {
     totalRows,
@@ -81,7 +83,7 @@ async function getListData(req, res) {
     page,
     rows,
     rowsAll,
-    filterRow,
+    // filterRow,
     search,
     query: req.query,
   };
