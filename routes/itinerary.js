@@ -43,14 +43,12 @@ router.post("/api/addlist", async (req, res) => {
     postData: req.body, //除錯用
   };
   const sql =
-  "INSERT INTO `itinerary`(`member_sid`, `list_number`, `list_name`, `day`, `date`, `status`, `created_date`) VALUES (?, ?, ?, ?, ?, ?, NOW())"
+  "INSERT INTO `itinerary`(`member_sid`, `list_number`, `list_name`, `day`, `date`, `status`, `created_date`) VALUES (?, ?, ?, ?, CURDATE(), 1, NOW())"
   const [result] = await db.query(sql, [
     req.body.member_sid,
     req.body.list_number,
     req.body.list_name,
-    req.body.day || 1,
-    req.body.date,
-    req.body.status,
+    req.body.day,
   ]);
 
   if (result.affectedRows) output.success = true;
@@ -58,8 +56,8 @@ router.post("/api/addlist", async (req, res) => {
 });
 
 // R 
-router.get(["/api/list/:list_number"], async (req, res) => {
-  const [rows] = await db.query("SELECT * FROM `itinerary` WHERE list_number=?",[req.params.list_number]);
+router.get(["/api/list/:member_sid"], async (req, res) => {
+  const [rows] = await db.query("SELECT * FROM `itinerary` WHERE member_sid=?",[req.params.member_sid]);
   res.json(rows);
 });
 router.get(["/api/list"], async (req, res) => {
@@ -108,7 +106,7 @@ router.post("/api/additem", async (req, res) => {
     postData: req.body, //除錯用
   };
   const sql =
-  "INSERT INTO `itinerary_detail`(`list_number`, `day`, `sequence`, `category`, `category_id`, `time`, `created_date`) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())"
+  "INSERT INTO `itinerary_detail`(`list_number`, `day`, `sequence`, `category`, `category_id`, `time`, `created_date`) VALUES (?, ?, ?, ?, ?, ?, NOW())"
   const [result] = await db.query(sql, [
     req.body.list_number,
     req.body.day,
