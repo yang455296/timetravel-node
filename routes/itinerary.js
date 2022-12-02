@@ -56,8 +56,12 @@ router.post("/api/addlist", async (req, res) => {
 });
 
 // R 
-router.get(["/api/list/:member_sid"], async (req, res) => {
+router.get(["/api/lists/:member_sid"], async (req, res) => {
   const [rows] = await db.query("SELECT * FROM `itinerary` WHERE member_sid=?",[req.params.member_sid]);
+  res.json(rows);
+});
+router.get(["/api/list/:list_number"], async (req, res) => {
+  const [[rows]] = await db.query("SELECT * FROM `itinerary` WHERE list_number=?",[req.params.list_number]);
   res.json(rows);
 });
 router.get(["/api/list"], async (req, res) => {
