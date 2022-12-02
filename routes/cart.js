@@ -51,7 +51,7 @@ router.post("/api/makeorder", async (req, res) => {
         element.uuid,
         element.id,
         element.quantity,
-        element.price,
+        element.price * element.quantity,
       ]);
 
       // if (result.affectedRows) output.success = true;
@@ -77,9 +77,9 @@ router.post("/api/makeorder", async (req, res) => {
         element.quantity,
         element.repName,
         element.repMobile,
-        element.checkintime,
-        element.checkouttime,
-        element.price,
+        element.checkin,
+        element.checkout,
+        element.price * element.quantity,
       ]);
     });
   }
@@ -106,6 +106,8 @@ router.post("/api/makeorder", async (req, res) => {
     });
   }
 });
+
+
 module.exports = router;
 
 // //美食訂單的C
