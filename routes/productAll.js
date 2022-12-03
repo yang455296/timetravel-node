@@ -81,11 +81,14 @@ async function getAllListData(req, res) {
 }
 
 
-
-
+//取得美食收藏資料
+router.get(["/foodCollect/:member_sid"], async (req, res) => {
+  const [rows] = await db.query("SELECT food_product_sid FROM `member_food_collect` ",[req.params.food_product_sid]);
+  res.json(rows);
+});
 //新增美食收藏
-router.post("/foodCollect/Add", async (req, res) => {
-  // res.json(req.body);
+router.post("/foodAddCollect", async (req, res) => {
+  res.json(req.body);
   const output = {
     success: false,
     code: 0,
@@ -104,11 +107,23 @@ router.post("/foodCollect/Add", async (req, res) => {
 
 
 // 移除美食收藏
-router.delete("/foodDelCollect/:food_product_sid", async (req, res) => {
-  const sql = "DELETE FROM member_food_collect WHERE food_product_sid=? ";
+router.delete("/foodDelCollect", async (req, res) => {
+  const sql = "DELETE FROM member_food_collect WHERE food_product_sid=''";
   const [result] = await db.query(sql, [req.params.food_product_sid]);
   res.json({ success: !!result.affectedRows, result });
 });
+
+
+//取得美食訂單資料
+router.get("/order/:sid", async (req, res) => {
+  const sql = "SELECT * FROM `orders_details_food` WHERE sid=? ";
+  const [result] = await db.query(sql, [req.params.sid]);
+  res.json({ success: !!result.affectedRows, result });
+});
+
+
+
+
 
 //取得所有商品資料
 router.get(["/api", "/api/list"], async (req, res) => {
