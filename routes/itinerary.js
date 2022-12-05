@@ -159,9 +159,9 @@ router.put("/api/edititem/:list_number", async (req, res) => {
 });
 
 // D
-router.delete("/api/delitem/:sid", async (req, res) => {
-  const sql = "DELETE FROM itinerary_detail WHERE sid=? ";
-  const [result] = await db.query(sql, [req.params.sid]);
+router.delete("/api/delitem/:list_number", async (req, res) => {
+  const sql = "DELETE FROM itinerary_detail WHERE list_number=? ";
+  const [result] = await db.query(sql, [req.params.list_number]);
   res.json({ success: !!result.affectedRows, result });
 });
 
