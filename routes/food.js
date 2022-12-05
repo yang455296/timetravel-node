@@ -34,29 +34,30 @@ async function getListData(req, res) {
     if (page > totalPages) {
       return res.redirect(`?page=${totalPages}`);
     }
-    const sql = `SELECT * FROM food_product_all 
-    JOIN food_categories ON food_product_all.categories_sid=food_categories.categories_sid
-    JOIN area ON food_product_all.area_sid=area.area_sid 
-    JOIN city ON food_product_all.city_sid=city.city_sid ${where} ORDER BY sid DESC LIMIT ${
-      (page - 1) * perPage
-    }, ${perPage} `;
-    [rows] = await db.query(sql);
-    const sql2 = `SELECT * FROM food_product_all 
+    // const sql = `SELECT * FROM food_product_all 
+    // JOIN food_categories ON food_product_all.categories_sid=food_categories.categories_sid
+    // JOIN area ON food_product_all.area_sid=area.area_sid 
+    // JOIN city ON food_product_all.city_sid=city.city_sid ${where} ORDER BY sid DESC LIMIT ${
+    //   (page - 1) * perPage
+    // }, ${perPage} `;
+    // [rows] = await db.query(sql);
+    const sql2 = `SELECT * FROM food_product_all
+    LEFT JOIN member_food_collect ON food_product_all.sid = member_food_collect.food_product_sid
     JOIN food_categories ON food_product_all.categories_sid=food_categories.categories_sid
     JOIN area ON food_product_all.area_sid=area.area_sid 
     JOIN city ON food_product_all.city_sid=city.city_sid ${where} ORDER BY sid DESC `;
-    [rowsAll] = await db.query(sql2);
+    [rows] = await db.query(sql2);
   }
-  return {
-    totalRows,
-    totalPages,
-    perPage,
-    page,
-    rows,
-    rowsAll,
-    search,
-    query: req.query,
-  };
+  return    rows
+    // totalRows,
+    // totalPages,
+    // perPage,
+    // page,
+ 
+  //   rowsAll,
+  //   search,
+  //   query: req.query,
+  // 
 }
 
 

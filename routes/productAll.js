@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const db = require(__dirname + "/../modules/db_connect2");
 
+// 專用處理sql字串的工具，主要format與escape
+const SqlString = require('sqlstring')
 // CRUD只要R，不需要登入
 router.use((req, res, next) => {
   next();
@@ -10,23 +12,8 @@ router.use((req, res, next) => {
 
 
 async function getAllListData(req, res) {
-  const perPage = 12;
-    //當前的page＝搜尋的page如果不是就是第一頁
-  let page = +req.query.page || 1;
-  if (page < 1) {
-    return res.redirect(req.baseUrl); // api不應該轉向
-  }
-  // 搜尋功能
-  let search = req.query.search ? req.query.search.trim() : "";
   let where = ` WHERE 1 `;
-  if (search) {
-    where += ` AND 
-        (
-            \`product_name\` LIKE ${db.escape("%" + search + "%")}
-            OR
-            \`city_name\` LIKE ${db.escape("%" + search + "%")}
-        ) `;
-  }
+  
   const food_t_sql = `SELECT COUNT(1) totalRows FROM food_product_all ${where}`;
   const site_t_sql = `SELECT COUNT(1) totalRows FROM site ${where}`;
   const hotel_t_sql = `SELECT COUNT(1) totalRows FROM hotel ${where}`;
@@ -38,18 +25,11 @@ async function getAllListData(req, res) {
   const [siteTotalRows] = await db.query(site_t_sql);
   const [hotelTotalRows]= await db.query(hotel_t_sql);
   const [ticketTotalRows]= await db.query(ticket_t_sql);
-//     console.log( [foodTotalRows])
-// console.log([siteTotalRows])
+
   // //算出總筆數
    const allTotalRows = foodTotalRows[0].totalRows+hotelTotalRows[0].totalRows+siteTotalRows[0].totalRows+ticketTotalRows[0].totalRows
-
-  //  .concat(siteTotalRows,hotelTotalRows,ticketTotalRows)
-
    console.log([[{allTotalRows}]])
-  //  + siteTotalRows[0].totalRows +hotelTotalRows[0].totalRows+ticketTotalRows[0].totalRows;
-  // // let allTotalPages = 0;
-  // const [[{allTotalRows}]] = foodTotalRows + siteTotalRows+hotelTotalRows+ticketTotalRows;
-  let allTotalPages = 0;
+ 
 
   let allRows = []
   let foodRows=[];
@@ -100,33 +80,56 @@ async function getAllListData(req, res) {
   return allRows
 }
 
+
+//取得美食收藏資料
+router.get(["/foodCollect/:member_sid"], async (req, res) => {
+  const [rows] = await db.query("SELECT food_product_sid FROM `member_food_collect` ",[req.params.food_product_sid]);
+  res.json(rows);
+});
+//新增美食收藏
+router.post("/foodAddCollect", async (req, res) => {
+  res.json(req.body);
+  const output = {
+    success: false,
+    code: 0,
+    error: {},
+    postData: req.body, //除錯用
+  };
+  const sql = "INSERT INTO `member_food_collect`(`member_sid`, `food_product_sid` ) VALUES (?, ?)"
+  const [result] = await db.query(sql, [
+    req.body.member_sid,
+    req.body.food_product_sid,
+  ]);
+
+  if (result.affectedRows) output.success = true;
+  res.json(output);
+});
+
+
+// 移除美食收藏
+router.delete("/foodDelCollect", async (req, res) => {
+  const sql = "DELETE FROM member_food_collect WHERE food_product_sid=''";
+  const [result] = await db.query(sql, [req.params.food_product_sid]);
+  res.json({ success: !!result.affectedRows, result });
+});
+
+
+//取得美食訂單資料
+router.get("/order/:sid", async (req, res) => {
+  const sql = "SELECT * FROM `orders_details_food` WHERE sid=? ";
+  const [result] = await db.query(sql, [req.params.sid]);
+  res.json({ success: !!result.affectedRows, result });
+});
+
+
+
+
+
 //取得所有商品資料
 router.get(["/api", "/api/list"], async (req, res) => {
   res.json(await getAllListData(req, res));
 });
 
-//TODO:從前端接收收藏資訊的api(notfinish)
-router.post(["/api/addCollect-api"],async(req,res)=>{
-  
-  const output={
-    success:false,
-    code:0,
-    error:{},
-    postData:req.body,//除錯
-  }
 
-
-  const sql = "INSERT INTO `member_food_collect`(`sid`, `member_sid`, `food_product_sid`) VALUES ('?','?','?') "
-
-  const [result] = await db.query(sql, [
-    req.body.sid,
-    req.body.member_sid,
-    req.body.food_product_sid,
-  ]);
-  //console.log(req.body.password);
-
-  if (result.affectedRows) output.success = true;
-  res.json(output);
-})
 
 module.exports = router;
