@@ -67,4 +67,44 @@ router.post("/api/submit-comment-api", async (req, res) => {
   }
 });
 
+//更改訂單已評論狀態
+router.put("/api/change-commented", async (req, res) => {
+  if (req.body.type === "food") {
+    const output = {
+      success: false,
+      code: 0,
+      error: {},
+      postData: req.body, //除錯用
+    };
+    console.log(req.body);
+    const sql =
+      "UPDATE `orders_details_food` JOIN `food_product_all` ON `food_product_all`.`sid`=`orders_details_food`.`food_products_sid` SET `commented`='1'  WHERE `orders_details_food`.`orders_uuid`=? AND `food_product_all`.`product_number`=?";
+    const [result] = await db.query(sql, [
+      req.body.uuid,
+      req.body.product_number,
+    ]);
+
+    if (result.affectedRows) output.success = true;
+    res.json(output);
+  }
+  if (req.body.type === "hotel") {
+    const output = {
+      success: false,
+      code: 0,
+      error: {},
+      postData: req.body, //除錯用
+    };
+    console.log(req.body);
+    const sql =
+      "UPDATE `orders_details_hotel` JOIN `hotel` ON `hotel`.`sid`=`orders_details_hotel`.`hotel_products_sid` SET `commented`='1'  WHERE `orders_details_hotel`.`orders_uuid`=? AND `hotel`.`product_number`=?";
+    const [result] = await db.query(sql, [
+      req.body.uuid,
+      req.body.product_number,
+    ]);
+
+    if (result.affectedRows) output.success = true;
+    res.json(output);
+  }
+});
+
 module.exports = router;
