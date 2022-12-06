@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const db = require(__dirname + "/../modules/db_connect2");
-
+const { v4: uuidv4 } = require("uuid");
 // CUD要，不要R，要登入
 
 router.use((req, res, next) => {
@@ -25,11 +25,13 @@ router.post("/api/makeorder", async (req, res) => {
       error: {},
       postData: req.body, //除錯用
     };
+    const pId = uuidv4();
     const sql =
-      "INSERT INTO `orders`(`member_sid`, `uuid`,`orders_total_price`, `orders_created_time`, `orders_status_sid`) VALUES (?, ?, ?, NOW(),2)";
+      "INSERT INTO `orders`(`member_sid`, `uuid`,`payment_id`,`orders_total_price`, `orders_created_time`, `orders_status_sid`) VALUES (?, ?, ?, ?, NOW(),2)";
     const [result] = await db.query(sql, [
       req.body.order.member_sid,
       req.body.order.uuid,
+      pId,
       req.body.order.orders_total_price,
     ]);
 
@@ -101,12 +103,11 @@ router.post("/api/makeorder", async (req, res) => {
         element.type,
         element.usedate,
         element.quantity,
-        element.price,
+        element.price * element.quantity,
       ]);
     });
   }
 });
-
 
 module.exports = router;
 
