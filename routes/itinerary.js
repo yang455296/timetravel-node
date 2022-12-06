@@ -72,7 +72,7 @@ router.get(["/api/list"], async (req, res) => {
 
 
 // U
-router.put("/api/editlist/:sid", async (req, res) => {
+router.put("/api/editlist/:list_number ", async (req, res) => {
   const output = {
     success: false,
     code: 0,
@@ -80,12 +80,12 @@ router.put("/api/editlist/:sid", async (req, res) => {
     postData: req.body, //除錯用
   };
   const sql =
-    "UPDATE `itinerary` SET `list_name` = ?, `day` = ?, `date` = ? WHERE `sid` = ?";
+    "UPDATE `itinerary` SET `list_name` = ?, `day` = ?, `date` = ? WHERE `list_number` = ?";
   const [result] = await db.query(sql, [
     req.body.list_name,
     req.body.day,
     req.body.date,
-    req.body.sid,
+    req.params.list_number ,
   ]);
 
   // console.log(result);
@@ -159,9 +159,9 @@ router.put("/api/edititem/:list_number", async (req, res) => {
 });
 
 // D
-router.delete("/api/delitem/:sid", async (req, res) => {
-  const sql = "DELETE FROM itinerary_detail WHERE sid=? ";
-  const [result] = await db.query(sql, [req.params.sid]);
+router.delete("/api/delitem/:list_number", async (req, res) => {
+  const sql = "DELETE FROM itinerary_detail WHERE list_number=? ";
+  const [result] = await db.query(sql, [req.params.list_number]);
   res.json({ success: !!result.affectedRows, result });
 });
 

@@ -163,6 +163,8 @@ app.use("/cart", require(__dirname + "/routes/cart"));
 
 app.use("/orders", require(__dirname + "/routes/orders"));
 
+app.use("/comment", require(__dirname + "/routes/comment"));
+
 // app.use("/pay", require(__dirname + "/routes/pay"));
 
 app.use("/member", require(__dirname + "/routes/member"));
