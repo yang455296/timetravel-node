@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const db = require(__dirname + "/../modules/db_connect2");
+const fs = require('fs')
 
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -37,26 +38,14 @@ router.use((req, res, next) => {
 //   ]);
 //   res.json(result);
 // });
-// router.post("/api/information", async (req, res) => {
-//   // res.json(req.body);
-//   const output = {
-//     success: false,
-//     code: 0,
-//     error: {},
-//     postData: req.body, //除錯用
-//   };
-//   const sql =
-//   "SELECT * FROM `member_information"
-//   const [result] = await db.query(sql, [
-//     req.body.userID,
-//     req.body.username,
-//     req.body.email,
-//     req.body.password_hash,
-//   ]);
 
-//   if (result.affectedRows) output.success = true;
-//   res.json(output);
-// });
+// 更改會員資料後重新拿到會員資料
+router.get("/api/information/:sid", async (req, res) => {
+  const sql =
+  "SELECT * FROM member_information where sid = ?"
+  const [result] = await db.query(sql,[req.params.sid]);
+  res.json(result);
+});
 // --------R---------取得會員資料
 router.get(["/api/memberlist"], async (req, res) => {
   const [rows] = await db.query("SELECT * FROM `member_information` WHERE 1");
@@ -230,12 +219,33 @@ router.post('/upload-avatar', async (req, res) => {
               status: false,
               message: 'No file uploaded'
           });
+          return;
       } else {
           //使用輸入框的名稱來獲取上傳檔案 (例如 "avatar")
+
           let avatar = req.files.avatar;
           
+          //用cookie存黨名
+
+          let picSecName = (avatar.mimetype.split('image/')[1]);
+
+          let picName = req.body.sid + '.' + picSecName 
+
+          req.session.picName = picName
+
+          //抓到舊檔案的檔名
+          const readOldPic = `SELECT member_information.member_img FROM member_information where sid = ${req.body.sid};`
+          const result = await db.query(readOldPic,[req.body.sid])
+
+          const oldPicName = (result[0][0].member_img);
+          console.log(oldPicName)
+
+          //先刪除舊檔案
+
+          fs.unlink('./public/uploads/Member/' + oldPicName ,(err)=>{})
+          
           //使用 mv() 方法來移動上傳檔案到要放置的目錄裡 (例如 "uploads")
-          avatar.mv('./uploads/Member/' + avatar.name);
+          avatar.mv('./public/uploads/Member/' + picName);
   
           //送出回應
           res.json({
@@ -247,19 +257,27 @@ router.post('/upload-avatar', async (req, res) => {
                   size: avatar.size
               }
           });
-          const sql =
-            "UPDATE `member_information` SET `member_img` = ? WHERE `sid` = ?";
-          const [result] = await db.query(sql, [
-              req.body.avatar,
-              req.body.sid,
-            ]);
-            if (result.changedRows) output.success = true;
-            res.json(output);
+          // const sql =
+          //   "UPDATE `member_information` SET `member_img` = ? WHERE `sid` = ?";
+          // const [result] = await db.query(sql, [
+          //     req.body.avatar,
+          //     req.body.sid,
+          //   ]);
+          //   if (result.changedRows) output.success = true;
+          //   res.json(output);
             //有錯誤
       }
   } catch (err) {
       res.status(500).json(err);
   }
+  const sql =
+            "UPDATE `member_information` SET `member_img` = ? WHERE `sid` = ?";
+          const [result] = await db.query(sql, [
+              req.session.picName,
+              req.body.sid,
+            ]);
+            // if (result.changedRows) output.success = true;
+            // res.json(result);
   });
 
 // ------------ResetPassword--------------重設密碼api
@@ -340,12 +358,15 @@ router.post('/api/login-api', async (req, res)=>{
   
   if(output.success){
       output.error = '';
-      const {sid, email} = row;
+      const {sid,username,email,telephone,member_img} = row;
       const token = jwt.sign({sid, email}, process.env.JWT_SECRET);
       output.auth = {
           sid,
+          username,
           email,
-          token
+          telephone,
+          member_img,
+          token,
       }
   } 
   //console.log(output)

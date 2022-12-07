@@ -184,7 +184,11 @@ app.use("/productAll", require(__dirname + "/routes/productAll"));
 app.post("/upload", upload.single("avatar"), async (req, res) => {
   res.json(req.file);
 });
-
+app.get('/', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+ 
+  res.setHeader('Content-Type', 'text/html');
+});
 const myMiddle = (req, res, next) => {
   res.locals = { ...res.local, node: "經過middleware" };
   next();

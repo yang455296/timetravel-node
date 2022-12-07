@@ -4,6 +4,7 @@
 /public/uploads
 /uploads
 /public/uploads
+/public/tmp-uploads
 /data
 /node_modules
 .vscode
