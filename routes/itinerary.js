@@ -60,10 +60,19 @@ router.get(["/api/listnew/:member_sid"], async (req, res) => {
   const [rows] = await db.query("SELECT * FROM `itinerary` WHERE member_sid=?",[req.params.member_sid]);
   res.json(rows);
 });
+// router.get(["/api/lists/:member_sid"], async (req, res) => {
+//   const [rows] = await db.query("SELECT * FROM `itinerary` WHERE member_sid=?",[req.params.member_sid]);
+//   res.json(rows);
+// });
 router.get(["/api/lists/:member_sid"], async (req, res) => {
-  const [rows] = await db.query("SELECT * FROM `itinerary` JOIN `itinerary_detail` ON itinerary.list_number = itinerary_detail.list_number JOIN `site` ON itinerary_detail.category_id = site.sid WHERE member_sid=?",[req.params.member_sid])
+  const [rows] = await db.query("SELECT * FROM `itinerary_detail` JOIN `itinerary` ON `itinerary`.`list_number`=`itinerary_detail`.`list_number` JOIN `site` ON `site`.`sid`=`itinerary_detail`.`category_id` WHERE member_sid=? GROUP BY `itinerary_detail`.`list_number` ORDER BY `itinerary`.`sid`",[req.params.member_sid]);
   res.json(rows);
 });
+
+// router.get(["/api/lists/:member_sid"], async (req, res) => {
+//   const [rows] = await db.query("SELECT * FROM `itinerary` JOIN `itinerary_detail` ON itinerary.list_number = itinerary_detail.list_number JOIN `site` ON itinerary_detail.category_id = site.sid WHERE member_sid=?",[req.params.member_sid])
+//   res.json(rows);
+// });
 router.get(["/api/list/:list_number"], async (req, res) => {
   const [[rows]] = await db.query("SELECT * FROM `itinerary` WHERE list_number=?",[req.params.list_number]);
   res.json(rows);
@@ -131,7 +140,7 @@ router.post("/api/additem", async (req, res) => {
 // R 
 router.get(["/api/item/:list_number"], async (req, res) => {
   const sql = 
-  "SELECT * FROM `itinerary_detail` JOIN site ON itinerary_detail.category_id=site.sid JOIN area ON site.area_sid=area.area_sid JOIN city ON area.city_sid=city.city_sid  WHERE list_number=?  ORDER BY `itinerary_detail`.`day`,`itinerary_detail`.`sequence` ASC"
+  "SELECT * FROM `itinerary_detail` JOIN site ON itinerary_detail.category_id=site.sid JOIN area ON site.area_sid=area.area_sid JOIN city ON area.city_sid=city.city_sid  WHERE list_number=?  ORDER BY `itinerary_detail`.`day`,`itinerary_detail`.`sequence`,`itinerary_detail`.`sid` ASC"
   const [result] = await db.query(sql, [req.params.list_number]); //TODO
   res.json(result);
   //不做分頁
