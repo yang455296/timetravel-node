@@ -56,8 +56,12 @@ router.post("/api/addlist", async (req, res) => {
 });
 
 // R 
-router.get(["/api/lists/:member_sid"], async (req, res) => {
+router.get(["/api/listnew/:member_sid"], async (req, res) => {
   const [rows] = await db.query("SELECT * FROM `itinerary` WHERE member_sid=?",[req.params.member_sid]);
+  res.json(rows);
+});
+router.get(["/api/lists/:member_sid"], async (req, res) => {
+  const [rows] = await db.query("SELECT * FROM `itinerary` JOIN `itinerary_detail` ON itinerary.list_number = itinerary_detail.list_number JOIN `site` ON itinerary_detail.category_id = site.sid WHERE member_sid=?",[req.params.member_sid])
   res.json(rows);
 });
 router.get(["/api/list/:list_number"], async (req, res) => {
@@ -94,9 +98,9 @@ router.put("/api/editlist/:list_number ", async (req, res) => {
   res.json(output);
 });
 // D
-router.delete("/api/dellist/:sid", async (req, res) => {
-  const sql = "DELETE FROM itinerary WHERE sid=? ";
-  const [result] = await db.query(sql, [req.params.sid]);
+router.delete("/api/dellist/:list_number", async (req, res) => {
+  const sql = "DELETE FROM itinerary WHERE list_number=? ";
+  const [result] = await db.query(sql, [req.params.list_number]);
   res.json({ success: !!result.affectedRows, result });
 });
 
