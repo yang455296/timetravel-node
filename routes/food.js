@@ -34,30 +34,16 @@ async function getListData(req, res) {
     if (page > totalPages) {
       return res.redirect(`?page=${totalPages}`);
     }
-    // const sql = `SELECT * FROM food_product_all 
-    // JOIN food_categories ON food_product_all.categories_sid=food_categories.categories_sid
-    // JOIN area ON food_product_all.area_sid=area.area_sid 
-    // JOIN city ON food_product_all.city_sid=city.city_sid ${where} ORDER BY sid DESC LIMIT ${
-    //   (page - 1) * perPage
-    // }, ${perPage} `;
-    // [rows] = await db.query(sql);
-    const sql2 = `SELECT * FROM food_product_all
+    
+    const sql = `SELECT * FROM food_product_all
     LEFT JOIN member_all_collect ON food_product_all.sid = member_all_collect.product_sid
     JOIN food_categories ON food_product_all.categories_sid=food_categories.categories_sid
     JOIN area ON food_product_all.area_sid=area.area_sid 
     JOIN city ON food_product_all.city_sid=city.city_sid WHERE 1 ORDER BY food_product_all.sid DESC `;
-    [rows] = await db.query(sql2);
+    [rows] = await db.query(sql);
   }
   return    rows
-    // totalRows,
-    // totalPages,
-    // perPage,
-    // page,
- 
-  //   rowsAll,
-  //   search,
-  //   query: req.query,
-  // 
+
 }
 
 
@@ -76,7 +62,7 @@ router.get("/item/:sid", async (req, res) => {
   res.json(data[0]);
 }); //單筆資料http://localhost:3001/site/item/12
 
-//單筆資料http://localhost:3001/site/item/12
+
 
 //取得評論的資料
 async function getCommitData(req, res) {
