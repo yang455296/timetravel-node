@@ -51,7 +51,7 @@ async function getList(req, res) {
 
 }
 
-//新增美食收藏
+//新增收藏
 router.post("/AddCollect", async (req, res) => {
 
   

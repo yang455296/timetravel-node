@@ -83,9 +83,12 @@ router.get(["/api/list"], async (req, res) => {
   //不做分頁
 });
 
+router.get("/api/editlist/:list_number", async (req, res) => {
+  res.json(req.params)
 
+})
 // U
-router.put("/api/editlist/:list_number ", async (req, res) => {
+router.put("/api/editlist/:list_number", async (req, res) => {
   const output = {
     success: false,
     code: 0,
