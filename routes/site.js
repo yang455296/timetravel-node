@@ -29,6 +29,7 @@ async function getListData(req, res) {
   const [[{ totalRows }]] = await db.query(t_sql);
   let totalPages = 0;
   let rows = [];
+  let rowsAll = [];
   if (totalRows > 0) {
     totalPages = Math.ceil(totalRows / perPage);
     if (page > totalPages) {
@@ -40,7 +41,12 @@ async function getListData(req, res) {
     JOIN city ON area.city_sid=city.city_sid ${where} ORDER BY sid LIMIT ${
       (page - 1) * perPage
     }, ${perPage} `;
+    const sqlAll = `SELECT * FROM site 
+    JOIN site_categories ON site.site_category_sid=site_categories.site_category_sid 
+    JOIN area ON site.area_sid=area.area_sid 
+    JOIN city ON area.city_sid=city.city_sid ${where} ORDER BY sid `;
     [rows] = await db.query(sql);
+    [rowsAll] = await db.query(sqlAll)
   }
   return {
     totalRows,
@@ -48,6 +54,7 @@ async function getListData(req, res) {
     perPage,
     page,
     rows,
+    rowsAll,
     search,
     query: req.query,
   };
