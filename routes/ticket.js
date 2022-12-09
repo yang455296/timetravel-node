@@ -49,7 +49,7 @@ async function getListData(req, res) {
     JOIN area ON tickets.cities_id=area.area_sid 
     JOIN city ON area.city_sid=city.city_sid
     JOIN tickets_types ON tickets_types.product_number = tickets.product_number
-    ${where} GROUP BY tickets.sid DESC `;
+    ${where} GROUP BY tickets.sid  `;
 
     [rows] = await db.query(sql);
     [rowsAll] = await db.query(sqlAll);
