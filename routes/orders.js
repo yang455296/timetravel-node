@@ -33,7 +33,7 @@ router.get(["/api/list/hotellist/:order_uuid"], async (req, res) => {
 }); //單筆資料http://localhost:3001/site/item/12
 router.get(["/api/list/ticketlist/:order_uuid"], async (req, res) => {
   const [rows] = await db.query(
-    "SELECT `product_name`,`product_number`,`ticket_price`,`orders_details_ticket`.`quantity`,`orders_details_ticket`.`total_price`,`orders_details_ticket`.`commented` FROM `tickets` JOIN `orders_details_ticket` JOIN `orders` ON `tickets`.`sid`=`orders_details_ticket`.`ticket_products_sid` AND `orders_details_ticket`.`orders_uuid`=`orders`.`uuid` WHERE `orders`.`uuid`=?",
+    "SELECT `product_name`, `tickets`.`product_number`, `tickets_types`.`product_price`, `orders_details_ticket`.`quantity`, `orders_details_ticket`.`total_price`, `orders_details_ticket`.`commented` FROM `tickets` JOIN `orders_details_ticket` JOIN `tickets_types` JOIN `orders` ON `tickets`.`sid` = `orders_details_ticket`.`ticket_products_sid` AND `orders_details_ticket`.`orders_uuid` = `orders`.`uuid` AND `orders_details_ticket`.`ticket_type` = `tickets_types`.`tickets_types` AND `tickets`.`product_number` = `tickets_types`.`product_number` WHERE `orders`.`uuid` = ?;",
     [req.params.order_uuid]
   );
   res.json(rows);
