@@ -107,7 +107,7 @@ router.get('/item/:sid/room',async(req,res)=>{
   // where hotel.sid = ?`;
   const sql = `SELECT hotel_room.room_type,hotel_room.room_price,hotel_room.room_picture FROM hotel_room
   JOIN hotel on hotel.product_number = hotel_room.product_number
-where hotel.sid = ?`
+  where hotel.sid = ?`
   const [data] = await db.query(sql,[req.params.sid])
   // res.json(data.length)
   res.json(data)
