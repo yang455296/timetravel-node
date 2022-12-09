@@ -51,6 +51,18 @@ async function getList(req, res) {
 
 }
 
+//查看詳細頁是否收藏
+router.get('/checkCollect/:sid', async(req,res)=>{
+  const sql = `SELECT collect_product_name FROM member_all_collect WHERE member_sid = ?`
+  const [data] = await db.query(sql,[req.params.sid])
+  res.json(data.map((v,i)=>{
+    return v.collect_product_name
+  }))
+})
+
+
+
+
 //新增收藏
 router.post("/AddCollect", async (req, res) => {
 
@@ -61,23 +73,28 @@ router.post("/AddCollect", async (req, res) => {
     error: {},
     postData: req.body, //除錯用
   };
-  const sql = "INSERT INTO `member_all_collect`(`member_sid`, `product_sid` ) VALUES (?, ?)"
+  const sql = "INSERT INTO `member_all_collect`(`member_sid`,`product_sid`,`collect_product_name` ) VALUES (?,?, ?)"
   const [result] = await db.query(sql, [
     req.body.member_sid,
     req.body.product_sid,
+    req.body.collect_product_name,
   ]);
 
   if (result.affectedRows) output.success = true;
-  res.json({success:true});
+  res.json(req.body);
   // res.end(output);
 
 });
-
+//
 
 // 移除收藏
-router.delete("/DelCollect", async (req, res) => {
-  const sql = "DELETE FROM member_all_collect WHERE product_sid=''";
-  const [result] = await db.query(sql, [req.params.product_sid]);
+router.post("/DelCollect", async (req, res) => {
+  const sql = "DELETE FROM member_all_collect WHERE member_sid = ? AND product_sid = ? AND collect_product_name = ? ";
+  const [result] = await db.query(sql, [
+      req.body.member_sid,
+      req.body.product_sid,
+      req.body.collect_product_name
+    ]);
   res.json({ success: !!result.affectedRows, result });
 });
 

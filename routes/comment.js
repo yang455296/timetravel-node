@@ -53,7 +53,7 @@ router.post("/api/submit-comment-api", async (req, res) => {
       postData: req.body, //除錯用
     };
     const sql =
-      "INSERT INTO `commit_food`(`product_name`, `product_number`, `commit_text`, `userID`, `score`) VALUES (?,?,?,?,?)";
+      "INSERT INTO `commit_tickets`(`product_name`, `product_number`, `commit_text`, `userID`, `score`) VALUES (?,?,?,?,?)";
     const [result] = await db.query(sql, [
       req.body.product_name,
       req.body.product_number,

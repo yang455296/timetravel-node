@@ -4,7 +4,7 @@ const db = require(__dirname + "/../modules/db_connect2");
 const axios = require("axios");
 const { v4: uuidv4 } = require("uuid");
 const crypto = require("crypto-js");
-
+const SHA256 = require("crypto-js/sha256");
 // const uuid = 1670387472990;
 //req.params.order_uuid
 let key;
@@ -112,6 +112,72 @@ router.put("/api/change-pay", async (req, res) => {
 
   if (result.affectedRows) output.success = true;
   res.json(output);
+});
+
+//綠界
+
+let result;
+router.get(["/api/paygreen/:uuid"], async (req, res) => {
+  const [rows] = await db.query(
+    "SELECT `uuid`,`payment_id`,`orders_total_price`,`orders_created_time` FROM `orders` WHERE uuid=?",
+    [req.params.uuid]
+  );
+  let date = new Date();
+  let day = date.getDate();
+  let hour = date.getHours();
+  let min = date.getMinutes();
+  let secounds = date.getSeconds();
+  let tradeNumber = rows[0].uuid + day + hour + min + secounds;
+  let Time = String(rows[0].orders_created_time);
+  //參數值為[PLEASE MODIFY]者，請在每次測試時給予獨特值
+  //若要測試非必帶參數請將base_param內註解的參數依需求取消註解 //
+  let MerchantID = 3002599;
+  let MerchantTradeNo = tradeNumber;
+  let MerchantTradeDate = Time.replaceAll("-", "/");
+  let PaymentType = "aio";
+  let TradeDesc = "TimeTravel";
+  let ItemName = "TimeTravel";
+  let ReturnURL = "http://localhost:3000/cart/success";
+  let ChoosePayment = "Credit";
+  let EncryptType = 1;
+  let HashKey = "spPjZn66i0OhqJsQ";
+  let HashIV = "hT5OJckN45isQTTs";
+  let TotalAmount = rows[0].orders_total_price;
+
+  let text = `HashKey=${HashKey}&ChoosePayment=${ChoosePayment}&EncryptType=${EncryptType}&ItemName=${ItemName}&MerchantID=${MerchantID}&MerchantTradeDate=${MerchantTradeDate}&MerchantTradeNo=${MerchantTradeNo}&PaymentType=${PaymentType}&ReturnURL=${ReturnURL}&TotalAmount=${TotalAmount}&TradeDesc=${TradeDesc}&HashIV=${HashIV}`;
+
+  let encoded = encodeURIComponent(text);
+  let low = encoded.toLowerCase();
+  let net = low.replace("%20", "+");
+  let encrypto = SHA256(net).toString();
+  let CheckMacValue = encrypto.toUpperCase();
+
+  let body = {
+    MerchantID: MerchantID,
+    MerchantTradeNo: MerchantTradeNo,
+    MerchantTradeDate: MerchantTradeDate,
+    PaymentType: PaymentType,
+    TradeDesc: TradeDesc,
+    ItemName: ItemName,
+    ReturnURL: ReturnURL,
+    ChoosePayment: ChoosePayment,
+    EncryptType: EncryptType,
+    CheckMacValue: CheckMacValue,
+  };
+
+  configs = {
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  };
+
+  const res2 = await axios.post(
+    "https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5",
+    body,
+    configs
+  );
+  result = res2.data;
+  res.json(result);
 });
 
 module.exports = router;
