@@ -61,14 +61,15 @@ router.post("/AddCollect", async (req, res) => {
     error: {},
     postData: req.body, //除錯用
   };
-  const sql = "INSERT INTO `member_all_collect`(`member_sid`, `product_sid` ) VALUES (?, ?)"
+  const sql = "INSERT INTO `member_all_collect`(`member_sid`,`product_sid`,`collect_product_name` ) VALUES (?,?, ?)"
   const [result] = await db.query(sql, [
     req.body.member_sid,
     req.body.product_sid,
+    req.body.collect_product_name,
   ]);
 
   if (result.affectedRows) output.success = true;
-  res.json({success:true});
+  res.json(req.body);
   // res.end(output);
 
 });
