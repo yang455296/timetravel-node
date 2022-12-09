@@ -5,6 +5,7 @@ const axios = require("axios");
 const { v4: uuidv4 } = require("uuid");
 const crypto = require("crypto-js");
 const SHA256 = require("crypto-js/sha256");
+const moment = require("moment");
 // const uuid = 1670387472990;
 //req.params.order_uuid
 let key;
@@ -122,28 +123,30 @@ router.get(["/api/paygreen/:uuid"], async (req, res) => {
     "SELECT `uuid`,`payment_id`,`orders_total_price`,`orders_created_time` FROM `orders` WHERE uuid=?",
     [req.params.uuid]
   );
+
+  let newdate = rows[0].orders_created_time;
   let date = new Date();
   let day = date.getDate();
   let hour = date.getHours();
   let min = date.getMinutes();
   let secounds = date.getSeconds();
   let tradeNumber = rows[0].uuid + day + hour + min + secounds;
-  let Time = String(rows[0].orders_created_time);
+  let Time = moment(newdate).format("YYYY/MM/DD HH:mm:ss");
   //參數值為[PLEASE MODIFY]者，請在每次測試時給予獨特值
   //若要測試非必帶參數請將base_param內註解的參數依需求取消註解 //
-  let MerchantID = 3002599;
+  let MerchantID = 3002607;
   let MerchantTradeNo = tradeNumber;
-  let MerchantTradeDate = Time.replaceAll("-", "/");
+  let MerchantTradeDate = Time;
   let PaymentType = "aio";
   let TradeDesc = "TimeTravel";
   let ItemName = "TimeTravel";
   let ReturnURL = "http://localhost:3000/cart/success";
   let ChoosePayment = "Credit";
   let EncryptType = 1;
-  let HashKey = "spPjZn66i0OhqJsQ";
-  let HashIV = "hT5OJckN45isQTTs";
-  let TotalAmount = rows[0].orders_total_price;
-
+  let HashKey = "pwFHCqoQZGmho4w6";
+  let HashIV = "EkRm7iFT261dpevs";
+  let TotalAmount = +rows[0].orders_total_price;
+  // console.log(TotalAmount);
   let text = `HashKey=${HashKey}&ChoosePayment=${ChoosePayment}&EncryptType=${EncryptType}&ItemName=${ItemName}&MerchantID=${MerchantID}&MerchantTradeDate=${MerchantTradeDate}&MerchantTradeNo=${MerchantTradeNo}&PaymentType=${PaymentType}&ReturnURL=${ReturnURL}&TotalAmount=${TotalAmount}&TradeDesc=${TradeDesc}&HashIV=${HashIV}`;
 
   let encoded = encodeURIComponent(text);
@@ -163,6 +166,7 @@ router.get(["/api/paygreen/:uuid"], async (req, res) => {
     ChoosePayment: ChoosePayment,
     EncryptType: EncryptType,
     CheckMacValue: CheckMacValue,
+    TotalAmount: TotalAmount,
   };
 
   configs = {
@@ -177,6 +181,7 @@ router.get(["/api/paygreen/:uuid"], async (req, res) => {
     configs
   );
   result = res2.data;
+  // console.log(result);
   res.json(result);
 });
 
