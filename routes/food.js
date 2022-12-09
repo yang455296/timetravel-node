@@ -36,7 +36,7 @@ async function getListData(req, res) {
     }
     
     const sql = `SELECT * FROM food_product_all
-    LEFT JOIN member_all_collect ON food_product_all.sid = member_all_collect.product_sid
+
     JOIN food_categories ON food_product_all.categories_sid=food_categories.categories_sid
     JOIN area ON food_product_all.area_sid=area.area_sid 
     JOIN city ON food_product_all.city_sid=city.city_sid WHERE 1 ORDER BY food_product_all.sid DESC `;
@@ -52,7 +52,6 @@ async function getListData(req, res) {
 router.get("/item/:sid", async (req, res) => {
   //
   const sql = `SELECT * FROM food_product_all 
-  LEFT JOIN member_all_collect ON food_product_all.sid = member_all_collect.product_sid
   JOIN food_categories ON food_product_all.categories_sid=food_categories.categories_sid 
   JOIN area ON food_product_all.area_sid=area.area_sid 
   JOIN city ON food_product_all.city_sid=city.city_sid 

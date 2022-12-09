@@ -18,17 +18,7 @@ async function getList(req, res) {
   if (page < 1) {
     return res.redirect(req.baseUrl); // api不應該轉向
   }
-  // 搜尋功能
-  // let search = req.query.search ? req.query.search.trim() : "";
-  // let where = ` WHERE 1 `;
-  // if (search) {
-  //   where += ` AND 
-  //       (
-  //           \`product_name\` LIKE ${db.escape("%" + search + "%")}
-  //           OR
-  //           \`applicable_store\` LIKE ${db.escape("%" + search + "%")}
-  //       ) `;
-  // }
+ 
   const t_sql = `SELECT COUNT(1) totalRows FROM product WHERE 1`;
   // 分頁功能
   const [[{ totalRows }]] = await db.query(t_sql);
@@ -40,21 +30,20 @@ async function getList(req, res) {
       return res.redirect(`?page=${totalPages}`);
     }
     const sql = `SELECT * FROM product 
-    LEFT JOIN member_all_collect ON member_all_collect.product_sid=product.sid
     JOIN area ON area.area_sid=product.area_sid
     JOIN city ON city.city_sid=area.city_sid
     ORDER BY product.sid  `;
      [rows] = await db.query(sql);
  
   }
-  return    rows
+  return rows
 
 }
 
 //查看詳細頁是否收藏
-router.get('/checkCollect/:sid', async(req,res)=>{
+router.get('/checkCollect/:member_sid', async(req,res)=>{
   const sql = `SELECT collect_product_name FROM member_all_collect WHERE member_sid = ?`
-  const [data] = await db.query(sql,[req.params.sid])
+  const [data] = await db.query(sql,[req.params.member_sid])
   res.json(data.map((v,i)=>{
     return v.collect_product_name
   }))
@@ -73,7 +62,7 @@ router.post("/AddCollect", async (req, res) => {
     error: {},
     postData: req.body, //除錯用
   };
-  const sql = "INSERT INTO `member_all_collect`(`member_sid`,`product_sid`,`collect_product_name` ) VALUES (?,?, ?)"
+  const sql = "INSERT INTO `member_all_collect`(`member_sid`,`product_sid`,`collect_product_name` ) VALUES (?, ?, ?)"
   const [result] = await db.query(sql, [
     req.body.member_sid,
     req.body.product_sid,
