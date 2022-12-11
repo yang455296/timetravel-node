@@ -43,12 +43,13 @@ router.post("/api/addlist", async (req, res) => {
     postData: req.body, //除錯用
   };
   const sql =
-  "INSERT INTO `itinerary`(`member_sid`, `list_number`, `list_name`, `day`, `date`, `status`, `created_date`) VALUES (?, ?, ?, ?, CURDATE(), 1, NOW())"
+  "INSERT INTO `itinerary`(`member_sid`, `list_number`, `list_name`, `day`, `date`, `status`, `created_date`) VALUES (?, ?, ?, ?, ?, 1, NOW())"
   const [result] = await db.query(sql, [
     req.body.member_sid,
     req.body.list_number,
     req.body.list_name,
     req.body.day,
+    "2022-12-25"
   ]);
 
   if (result.affectedRows) output.success = true;
