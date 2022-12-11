@@ -28,15 +28,19 @@ router.post("/api/makeorder", async (req, res) => {
     const pId = uuidv4();
     const sql =
       "INSERT INTO `orders`(`member_sid`, `uuid`,`payment_id`,`orders_total_price`, `orders_created_time`, `orders_status_sid`) VALUES (?, ?, ?, ?, NOW(),2)";
-    const [result] = await db.query(sql, [
-      req.body.order.member_sid,
-      req.body.order.uuid,
-      pId,
-      req.body.order.orders_total_price,
-    ]);
+    try {
+      const [result] = await db.query(sql, [
+        req.body.order.member_sid,
+        req.body.order.uuid,
+        pId,
+        req.body.order.orders_total_price,
+      ]);
 
-    if (result.affectedRows) output.success = true;
-    res.json(output);
+      if (result.affectedRows) output.success = true;
+      res.json(output);
+    } catch {
+      console.log(res.errored);
+    }
   }
   //美食的C
   if (req.body.food) {
@@ -72,17 +76,21 @@ router.post("/api/makeorder", async (req, res) => {
       };
       const sql =
         "INSERT INTO `orders_details_hotel`(`orders_uuid`, `hotel_products_sid`, `room_type`, `quantity`,`rep_name`,`rep_mobile`,`checkin_time`,`checkout_time`,`total_price`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-      const [result] = await db.query(sql, [
-        element.uuid,
-        element.id,
-        element.type,
-        element.quantity,
-        element.repName,
-        element.repMobile,
-        element.checkin,
-        element.checkout,
-        element.price * element.quantity,
-      ]);
+      try {
+        const [result] = await db.query(sql, [
+          element.uuid,
+          element.id,
+          element.type,
+          element.quantity,
+          element.repName,
+          element.repMobile,
+          element.checkin,
+          element.checkout,
+          element.price * element.quantity,
+        ]);
+      } catch {
+        console.log(res.errored);
+      }
     });
   }
 
@@ -95,16 +103,20 @@ router.post("/api/makeorder", async (req, res) => {
         error: {},
         postData: req.body, //除錯用
       };
-      const sql =
-        "INSERT INTO `orders_details_ticket`(`orders_uuid`, `ticket_products_sid`, `ticket_type`,`use_day`,`quantity`, `total_price`) VALUES (?, ?, ?, ?, ?, ?)";
-      const [result] = await db.query(sql, [
-        element.uuid,
-        element.id,
-        element.type,
-        element.usedate,
-        element.quantity,
-        element.price * element.quantity,
-      ]);
+      try {
+        const sql =
+          "INSERT INTO `orders_details_ticket`(`orders_uuid`, `ticket_products_sid`, `ticket_type`,`use_day`,`quantity`, `total_price`) VALUES (?, ?, ?, ?, ?, ?)";
+        const [result] = await db.query(sql, [
+          element.uuid,
+          element.id,
+          element.type,
+          element.usedate,
+          element.quantity,
+          element.price * element.quantity,
+        ]);
+      } catch {
+        console.log(res.errored);
+      }
     });
   }
 });
