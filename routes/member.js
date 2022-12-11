@@ -6,6 +6,8 @@ const fs = require('fs')
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+const { v4: uuidv4 } = require("uuid");
+
 const upload = require(__dirname + "/../modules/upload-img");
 
 // CRUD都要，也要登入
@@ -229,7 +231,9 @@ router.post('/upload-avatar', async (req, res) => {
 
           let picSecName = (avatar.mimetype.split('image/')[1]);
 
-          let picName = req.body.sid + '.' + picSecName 
+          const picUUID = uuidv4();
+
+          let picName = req.body.sid  + picUUID + '.' + picSecName 
 
           req.session.picName = picName
 
