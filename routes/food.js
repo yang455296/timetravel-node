@@ -46,8 +46,6 @@ async function getListData(req, res) {
 
 }
 
-
-
 // R
 router.get("/item/:sid", async (req, res) => {
   //
